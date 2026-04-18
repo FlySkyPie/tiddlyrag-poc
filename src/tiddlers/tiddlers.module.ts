@@ -8,5 +8,6 @@ import { DatabaseModule } from '../database/database.module';
   imports: [DatabaseModule],
   controllers: [TiddlersController],
   providers: [...tiddlerProviders, TiddlersService],
+  exports: [TiddlersService],
 })
 export class TiddlersModule {}
