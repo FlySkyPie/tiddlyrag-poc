@@ -1,8 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
+import { Repository } from 'typeorm';
+
+import { Tiddler } from './tiddler.entity';
 
 @Injectable()
 export class TiddlersService {
-  getHello(): string {
-    return 'Hello World!';
+  constructor(
+    @Inject('TIDDLER_REPOSITORY')
+    private tiddlerRepository: Repository<Tiddler>,
+  ) {}
+
+  async create(tiddlers: Partial<Tiddler>[]): Promise<Tiddler[]> {
+    return this.tiddlerRepository.save(tiddlers);
   }
 }

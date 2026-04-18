@@ -9,6 +9,10 @@ export class WikisService {
     private wikiRepository: Repository<Wiki>,
   ) {}
 
+  async create(wiki: Partial<Wiki>): Promise<Wiki> {
+    return this.wikiRepository.save(wiki);
+  }
+
   async findAll(): Promise<Wiki[]> {
     return this.wikiRepository.find();
   }
