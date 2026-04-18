@@ -5,7 +5,7 @@ import { Wiki } from './wiki.entity';
 @Injectable()
 export class WikisService {
   constructor(
-    @Inject('PHOTO_REPOSITORY')
+    @Inject('WIKI_REPOSITORY')
     private wikiRepository: Repository<Wiki>,
   ) {}
 
