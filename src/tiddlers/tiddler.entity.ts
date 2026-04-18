@@ -7,7 +7,7 @@ export class Tiddler {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 500 })
+  @Column({ length: 500, unique: true })
   title: string;
 
   @Column({ length: 500, nullable: true })

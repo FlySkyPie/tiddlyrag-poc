@@ -4,7 +4,10 @@ import { Tiddler } from 'src/tiddlers/tiddler.entity';
 @Entity()
 export class Wiki {
   @PrimaryGeneratedColumn()
-  id: number;
+  uid: number;
+
+  @Column({ length: 500, unique: true })
+  id: string;
 
   @Column({ length: 500 })
   title: string;
