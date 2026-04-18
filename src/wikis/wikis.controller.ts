@@ -36,36 +36,33 @@ export class WikisController {
       },
     },
   })
-  async createWiki(@UploadedFile() tiddlywiki: Express.Multer.File) {
+  async createWiki(
+    @UploadedFile() tiddlywiki: Express.Multer.File,
+    @Body() createWikiDto: CreateWikiDto,
+  ) {
     const knowledge = this.tiddlywikisService.resolveTiddlyWiki(
       tiddlywiki.buffer.toString(),
     );
 
-    // Generate wiki id from title
-    const id = knowledge.title.toLowerCase().replace(/\s+/g, '-');
-
     // Create and save wiki first
     const savedWiki = await this.wikisService.create({
-      id,
+      id: createWikiDto.id,
       title: knowledge.title,
       subtitle: knowledge.subtitle,
       description: `Wiki for ${knowledge.title}`,
     });
 
     // Prepare tiddlers with wiki reference
-    const tiddlerData = knowledge.tiddlers.map((t) => ({
-      title: t.title,
-      text: t.text,
-      type: t.type,
-      tags: t.tags,
-      meta: {
-        created: t.created,
-        modified: t.modified,
-        revision: t.revision,
-        bag: t.bag,
-      },
-      wiki: savedWiki,
-    }));
+    const tiddlerData = knowledge.tiddlers.map(
+      ({ title, text, type, tags, ...rest }) => ({
+        title,
+        text,
+        type,
+        tags,
+        meta: rest,
+        wiki: savedWiki,
+      }),
+    );
 
     // Save tiddlers
     await this.tiddlersService.create(tiddlerData);
