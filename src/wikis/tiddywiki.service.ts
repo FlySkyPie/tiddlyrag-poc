@@ -7,9 +7,12 @@ import { TiddlyWiki } from 'tiddlywiki';
 
 import type { TiddywikiKnowledge } from './interfaces/tiddywiki-knowledge.dto';
 import type { Tiddler } from './interfaces/tiddler.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class TiddlywikisService {
+  constructor(private readonly configService: ConfigService) {}
+
   public resolveTiddlyWiki(tiddlyHtml: string): TiddywikiKnowledge {
     const $tw = TiddlyWiki();
 
@@ -59,6 +62,12 @@ export class TiddlywikisService {
     };
   }
 
+  public loadTemplate(): ITiddlyWiki {
+    return this.loadWiki(
+      this.configService.get<string>('tiddlywiki.template')!,
+    );
+  }
+
   /**
    * The TiddlyWiki template should be a folder containing following elements:
    * ```
@@ -67,7 +76,7 @@ export class TiddlywikisService {
    * └── tiddlywiki.info
    * ```
    */
-  public loadTemplate(wikiPath: string): ITiddlyWiki {
+  public loadWiki(wikiPath: string): ITiddlyWiki {
     const $tw = TiddlyWiki();
 
     // Set array to fix runtime error, set `version` to prevent print help info
