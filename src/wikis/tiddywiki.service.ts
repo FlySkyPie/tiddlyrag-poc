@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import type { ITiddlyWiki } from 'tiddlywiki';
 import { Injectable } from '@nestjs/common';
 import { TiddlyWiki } from 'tiddlywiki';
 
@@ -9,7 +10,7 @@ import type { Tiddler } from './interfaces/tiddler.dto';
 
 @Injectable()
 export class TiddlywikisService {
-  resolveTiddlyWiki(tiddlyHtml: string): TiddywikiKnowledge {
+  public resolveTiddlyWiki(tiddlyHtml: string): TiddywikiKnowledge {
     const $tw = TiddlyWiki();
 
     // Set array to fix runtime error, set `version` to prevent print help info
@@ -56,5 +57,25 @@ export class TiddlywikisService {
       subtitle: subtitleTiddler.text,
       tiddlers: knowledgeTiddlers,
     };
+  }
+
+  /**
+   * The TiddlyWiki template should be a folder containing following elements:
+   * ```
+   * ├── plugins
+   * ├── tiddlers
+   * └── tiddlywiki.info
+   * ```
+   */
+  public loadTemplate(wikiPath: string): ITiddlyWiki {
+    const $tw = TiddlyWiki();
+
+    // Set array to fix runtime error, set `version` to prevent print help info
+    $tw.boot.argv = ['version'];
+    $tw.boot.boot();
+
+    $tw.loadWikiTiddlers(wikiPath);
+
+    return $tw as ITiddlyWiki;
   }
 }

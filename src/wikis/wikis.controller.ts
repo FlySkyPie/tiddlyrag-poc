@@ -1,3 +1,4 @@
+import { Readable } from 'node:stream';
 import {
   Controller,
   Get,
@@ -6,8 +7,10 @@ import {
   UseInterceptors,
   Body,
   UploadedFile,
+  Param,
+  StreamableFile,
 } from '@nestjs/common';
-import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiProduces } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 import type { Wiki } from './wiki.entity';
@@ -73,6 +76,16 @@ export class WikisController {
   @Get()
   async getWikis(): Promise<Wiki[]> {
     return this.wikisService.findAll();
+  }
+
+  @Get(':wiki')
+  @ApiProduces('text/html')
+  async getWiki(@Param('wiki') wikiId: string): Promise<StreamableFile> {
+    const html = await this.wikisService.findTiddlyWiki(wikiId);
+    return new StreamableFile(Readable.from(html), {
+      type: 'text/html',
+      disposition: `attachment; filename="${wikiId}.html"`,
+    });
   }
 
   @Delete()
