@@ -5,6 +5,7 @@ import { WikisModule } from './wikis/wikis.module';
 import { TiddlersModule } from './tiddlers/tiddlers.module';
 import { DatabaseModule } from './database/database.module';
 import databaseConfig from './config/database';
+import tiddlywikiConfig from './config/tiddlywiki';
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import databaseConfig from './config/database';
     TiddlersModule,
     DatabaseModule,
     ConfigModule.forRoot({
-      load: [databaseConfig],
+      load: [databaseConfig, tiddlywikiConfig],
       isGlobal: true,
     }),
   ],

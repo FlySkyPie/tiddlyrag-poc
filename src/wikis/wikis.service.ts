@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { resolve } from 'node:path';
 import { Injectable, Inject } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
 
 import { Wiki } from './wiki.entity';
@@ -13,6 +14,7 @@ export class WikisService {
     @Inject('WIKI_REPOSITORY')
     private wikiRepository: Repository<Wiki>,
     private readonly tiddlywikisService: TiddlywikisService,
+    private readonly configService: ConfigService,
   ) {}
 
   async create(wiki: Partial<Wiki>): Promise<Wiki> {
@@ -37,8 +39,9 @@ export class WikisService {
       throw new Error(`The wiki not found: ${widiId}`);
     }
 
-    const templatePath = resolve(__dirname, '../../tiddlywiki-template/base');
-    const $tw = this.tiddlywikisService.loadTemplate(templatePath);
+    const $tw = this.tiddlywikisService.loadTemplate(
+      this.configService.get<string>('tiddlywiki.template')!,
+    );
 
     $tw.wiki.addTiddler(
       new $tw.Tiddler({ text: wiki.title }, { title: '$:/SiteTitle' }),
