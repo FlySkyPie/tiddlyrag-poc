@@ -1,41 +1,59 @@
-import { Controller, Get, Post, Put, Delete, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+} from '@nestjs/common';
 import { TiddlersService } from './tiddlers.service';
+import { Tiddler } from './tiddler.entity';
+import { Wiki } from '../wikis/wiki.entity';
 
 @Controller('wikis/:wiki/tiddlers')
 export class TiddlersController {
-  constructor(private readonly appService: TiddlersService) {}
+  constructor(private readonly tiddlersService: TiddlersService) {}
 
   @Post()
-  createTiddler(@Param('wiki') wiki: string): string {
-    throw new Error('Not implemented');
+  async createTiddler(
+    @Param('wiki') wikiId: string,
+    @Body() createTiddlerDto: Partial<Tiddler>,
+  ): Promise<Tiddler> {
+    const wiki = { id: wikiId } as Wiki;
+    const tiddlers = await this.tiddlersService.create([
+      { ...createTiddlerDto, wiki },
+    ]);
+    return tiddlers[0];
   }
 
   @Get()
-  getTiddlers(@Param('wiki') wiki: string): string {
-    throw new Error('Not implemented');
+  async getTiddlers(@Param('wiki') wikiId: string): Promise<Tiddler[]> {
+    return this.tiddlersService.findAll(wikiId);
   }
 
   @Get(':tiddler')
-  getTiddler(
-    @Param('wiki') wiki: string,
-    @Param('tiddler') tiddler: string,
-  ): string {
-    throw new Error('Not implemented');
+  async getTiddler(
+    @Param('wiki') wikiId: string,
+    @Param('tiddler') tiddlerTitle: string,
+  ): Promise<Tiddler> {
+    return this.tiddlersService.findOne(wikiId, tiddlerTitle);
   }
 
   @Put(':tiddler')
-  updateTiddler(
-    @Param('wiki') wiki: string,
-    @Param('tiddler') tiddler: string,
-  ): string {
-    throw new Error('Not implemented');
+  async updateTiddler(
+    @Param('wiki') wikiId: string,
+    @Param('tiddler') tiddlerTitle: string,
+    @Body() updateTiddlerDto: Partial<Tiddler>,
+  ): Promise<Tiddler> {
+    return this.tiddlersService.update(wikiId, tiddlerTitle, updateTiddlerDto);
   }
 
   @Delete(':tiddler')
-  deleteTiddler(
-    @Param('wiki') wiki: string,
-    @Param('tiddler') tiddler: string,
-  ): string {
-    throw new Error('Not implemented');
+  async deleteTiddler(
+    @Param('wiki') wikiId: string,
+    @Param('tiddler') tiddlerTitle: string,
+  ): Promise<void> {
+    return this.tiddlersService.delete(wikiId, tiddlerTitle);
   }
 }
