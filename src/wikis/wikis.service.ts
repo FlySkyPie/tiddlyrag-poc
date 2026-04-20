@@ -1,12 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Injectable, Inject } from '@nestjs/common';
 import { Repository } from 'typeorm';
 
 import { TiddlersService } from '../tiddlers/tiddlers.service';
+import { TiddlywikisService } from '../tiddywiki/tiddywiki.service';
+
 import { Wiki } from './wiki.entity';
-import { TiddlywikisService } from './tiddywiki.service';
 
 @Injectable()
 export class WikisService {

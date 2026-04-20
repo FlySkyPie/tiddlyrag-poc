@@ -1,13 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import type { ITiddlyWiki } from 'tiddlywiki';
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { TiddlyWiki } from 'tiddlywiki';
 
 import type { TiddywikiKnowledge } from './interfaces/tiddywiki-knowledge.dto';
 import type { Tiddler } from './interfaces/tiddler.dto';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class TiddlywikisService {
@@ -51,8 +48,8 @@ export class TiddlywikisService {
       throw new Error("Invalid TiddyWiki file, '$:/SiteSubtitle'' is messing");
     }
 
-    const knowledgeTiddlers = tiddlers.filter(
-      ({ tags }) => tags.includes('knowledge') as boolean,
+    const knowledgeTiddlers = tiddlers.filter(({ tags }) =>
+      tags.includes('knowledge'),
     );
 
     return {
@@ -85,6 +82,6 @@ export class TiddlywikisService {
 
     $tw.loadWikiTiddlers(wikiPath);
 
-    return $tw as ITiddlyWiki;
+    return $tw;
   }
 }
