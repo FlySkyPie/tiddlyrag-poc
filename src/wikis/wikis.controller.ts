@@ -58,8 +58,8 @@ export class WikisController {
     });
   }
 
-  @Delete()
-  deleteWikis(): string {
-    throw new Error('Not implemented');
+  @Delete(':wiki')
+  async deleteWiki(@Param('wiki') wikiId: string): Promise<void> {
+    return this.wikisService.remove(wikiId);
   }
 }

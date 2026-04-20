@@ -55,6 +55,16 @@ export class WikisService {
     return this.wikiRepository.find();
   }
 
+  async remove(widiId: string): Promise<void> {
+    const wiki = await this.wikiRepository.findOne({
+      where: { id: widiId },
+    });
+    if (!wiki) {
+      throw new Error(`The wiki not found: ${widiId}`);
+    }
+    await this.wikiRepository.remove(wiki);
+  }
+
   async findTiddlyWiki(widiId: string): Promise<string> {
     const wiki = await this.wikiRepository.findOne({
       relations: {
