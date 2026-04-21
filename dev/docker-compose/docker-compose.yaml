@@ -34,11 +34,11 @@ services:
       - --pooling
       - mean
       - --ctx-size
-      - "2048"
+      - "8192"
       - --batch-size
-      - "1024"
+      - "4096"
       - --ubatch-size
-      - "2048"
+      - "8192"
       - --gpu-layers
       - "999"
       # - --no-mmap

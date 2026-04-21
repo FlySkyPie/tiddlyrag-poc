@@ -1,8 +1,11 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 
-import { Tiddler } from './tiddler.entity';
+import type { Tiddler as TwTiddler } from '../tiddywiki/interfaces/tiddler.dto';
 import { Wiki } from '../wikis/wiki.entity';
+import { EmbeddingService } from '../embedding/embedding.service';
+
+import { Tiddler } from './tiddler.entity';
 
 @Injectable()
 export class TiddlersService {
@@ -11,10 +14,36 @@ export class TiddlersService {
     private tiddlerRepository: Repository<Tiddler>,
     @Inject('WIKI_REPOSITORY')
     private wikiRepository: Repository<Wiki>,
+
+    private readonly embeddingService: EmbeddingService,
   ) {}
 
   async create(tiddlers: Partial<Tiddler>[]): Promise<Tiddler[]> {
     return this.tiddlerRepository.save(tiddlers);
+  }
+
+  async createMany(
+    wiki: Wiki,
+    twTiddlers: Partial<TwTiddler>[],
+  ): Promise<Tiddler[]> {
+    const payload: Partial<Tiddler>[] = [];
+
+    for (let index = 0; index < twTiddlers.length; index++) {
+      const { title, text, type, tags, ...rest } = twTiddlers[index];
+      const embedding = await this.embeddingService.embedding(text ?? '');
+
+      payload.push({
+        title,
+        text,
+        type,
+        tags,
+        embedding,
+        meta: rest,
+        wiki,
+      });
+    }
+
+    return this.tiddlerRepository.save(payload);
   }
 
   async findAll(wikiId: string): Promise<Tiddler[]> {

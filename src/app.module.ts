@@ -6,6 +6,7 @@ import { TiddlersModule } from './tiddlers/tiddlers.module';
 import { DatabaseModule } from './database/database.module';
 import databaseConfig from './config/database';
 import tiddlywikiConfig from './config/tiddlywiki';
+import openaiConfig from './config/openai';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import tiddlywikiConfig from './config/tiddlywiki';
     TiddlersModule,
     DatabaseModule,
     ConfigModule.forRoot({
-      load: [databaseConfig, tiddlywikiConfig],
+      load: [databaseConfig, tiddlywikiConfig, openaiConfig],
       isGlobal: true,
     }),
   ],

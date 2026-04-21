@@ -13,22 +13,21 @@ export class EmbeddingService {
     private readonly configService: ConfigService,
   ) {}
 
-  async embedding(): Promise<number[]> {
+  async embedding(input: string): Promise<number[]> {
     const model = this.configService.get<string>('openai.embedding.model')!;
     const baseURL = this.configService.get<string>(
       'openai.embedding.api_base',
     )!;
     const apiKey = this.configService.get<string>('openai.embedding.api_key')!;
     const request: EmbeddingCreateParams = {
-      input: '',
+      input,
       model,
     };
     const response =
       await this.httpService.axiosRef.post<CreateEmbeddingResponse>(
-        '/embeddings',
+        baseURL,
         request,
         {
-          baseURL,
           headers: {
             Authorization: `Bearer ${apiKey}`,
           },

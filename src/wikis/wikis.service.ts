@@ -33,20 +33,8 @@ export class WikisService {
       description: `Wiki for ${knowledge.title}`,
     });
 
-    // Prepare tiddlers with wiki reference
-    const tiddlerData = knowledge.tiddlers.map(
-      ({ title, text, type, tags, ...rest }) => ({
-        title,
-        text,
-        type,
-        tags,
-        meta: rest,
-        wiki: savedWiki,
-      }),
-    );
-
     // Save tiddlers
-    await this.tiddlersService.create(tiddlerData);
+    await this.tiddlersService.createMany(savedWiki, knowledge.tiddlers);
 
     return savedWiki;
   }
