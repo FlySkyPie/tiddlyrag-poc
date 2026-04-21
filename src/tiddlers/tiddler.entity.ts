@@ -22,6 +22,9 @@ export class Tiddler {
   @Column('jsonb')
   meta: Record<string, any>;
 
+  @Column('vector')
+  embedding: number[];
+
   @ManyToOne(() => Wiki, (wiki) => wiki.tiddlers)
   wiki: Wiki;
 }
