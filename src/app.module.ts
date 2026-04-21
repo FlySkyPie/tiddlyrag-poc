@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 
 import { WikisModule } from './wikis/wikis.module';
 import { TiddlersModule } from './tiddlers/tiddlers.module';
+import { RetrievalModule } from './retrieval/retrieval.module';
 import { DatabaseModule } from './database/database.module';
 import databaseConfig from './config/database';
 import tiddlywikiConfig from './config/tiddlywiki';
@@ -13,6 +14,7 @@ import openaiConfig from './config/openai';
     WikisModule,
     TiddlersModule,
     DatabaseModule,
+    RetrievalModule,
     ConfigModule.forRoot({
       load: [databaseConfig, tiddlywikiConfig, openaiConfig],
       isGlobal: true,
