@@ -4,6 +4,8 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 
 import { WikisService } from '../wikis/wikis.service';
+import { EmbeddingService } from '../embedding/embedding.service';
+import { TiddlersService } from '../tiddlers/tiddlers.service';
 
 import { ResolveWikiParamsDto } from './dto/resolve-wiki-params.dto';
 import { QueryTiddlersParamsDto } from './dto/query-tiddlers-params.dto';
@@ -12,7 +14,11 @@ import { QueryTiddlersResponseItemDto } from './dto/query-tiddlers-response-item
 
 @Controller('retrieval')
 export class RetrievalController {
-  constructor(private readonly wikisService: WikisService) {}
+  constructor(
+    private readonly wikisService: WikisService,
+    private readonly embeddingService: EmbeddingService,
+    private readonly tiddlersService: TiddlersService,
+  ) {}
 
   @Post('wikis')
   @ApiOperation({
@@ -54,6 +60,8 @@ export class RetrievalController {
       throw new Error(`The wiki not found: ${wikiId}`);
     }
 
-    throw new Error('Not implemented yet');
+    const embeddingVec = await this.embeddingService.embedding(query);
+
+    return this.tiddlersService.queryByVector(wikiId, embeddingVec);
   }
 }

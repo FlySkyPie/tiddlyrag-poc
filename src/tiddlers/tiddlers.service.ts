@@ -110,4 +110,19 @@ export class TiddlersService {
     }
     await this.tiddlerRepository.remove(tiddler);
   }
+
+  async queryByVector(
+    wikiId: string,
+    embedding: number[],
+    limit: number = 5,
+  ): Promise<Tiddler[]> {
+    return this.tiddlerRepository
+      .createQueryBuilder('tiddler')
+      .innerJoin('tiddler.wiki', 'wiki')
+      .where('wiki.id = :wikiId', { wikiId })
+      .orderBy('tiddler.embedding <-> :embedding')
+      .setParameters({ embedding })
+      .limit(limit)
+      .getMany();
+  }
 }

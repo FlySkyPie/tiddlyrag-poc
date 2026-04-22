@@ -12,5 +12,6 @@ import { wikiProviders } from './wiki.providers';
   imports: [DatabaseModule, TiddlersModule, TiddlywikisModule],
   controllers: [WikisController],
   providers: [...wikiProviders, WikisService],
+  exports: [WikisService],
 })
 export class WikisModule {}

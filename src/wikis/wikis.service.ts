@@ -39,6 +39,12 @@ export class WikisService {
     return savedWiki;
   }
 
+  async findOne(wikiId: string): Promise<Wiki | null> {
+    return this.wikiRepository.findOne({
+      where: { id: wikiId },
+    });
+  }
+
   async findAll(): Promise<Wiki[]> {
     return this.wikiRepository.find();
   }
@@ -53,18 +59,18 @@ export class WikisService {
     await this.wikiRepository.remove(wiki);
   }
 
-  async findTiddlyWiki(widiId: string): Promise<string> {
+  async findTiddlyWiki(wikiId: string): Promise<string> {
     const wiki = await this.wikiRepository.findOne({
       relations: {
         tiddlers: true,
       },
       where: {
-        id: widiId,
+        id: wikiId,
       },
     });
 
     if (!wiki) {
-      throw new Error(`The wiki not found: ${widiId}`);
+      throw new Error(`The wiki not found: ${wikiId}`);
     }
 
     const $tw = this.tiddlywikisService.loadTemplate();
