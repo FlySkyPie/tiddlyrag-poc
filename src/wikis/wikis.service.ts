@@ -1,14 +1,9 @@
-import { readFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
-
 import type { Repository } from 'typeorm';
 import { Injectable, Inject } from '@nestjs/common';
-import Handlebars from 'handlebars';
 
 import type { TiddlersService } from '../tiddlers/tiddlers.service';
 import type { TiddlywikisService } from '../tiddywiki/tiddywiki.service';
 import type { LlmService } from '../llm/llm.service';
-import type { EmbeddingService } from '../embedding/embedding.service';
 
 import { Wiki } from './wiki.entity';
 
@@ -20,7 +15,6 @@ export class WikisService {
     private readonly tiddlywikisService: TiddlywikisService,
     private readonly tiddlersService: TiddlersService,
     private readonly llmService: LlmService,
-    private readonly embeddingService: EmbeddingService,
   ) {}
 
   async create(wiki: Partial<Wiki>): Promise<Wiki> {
@@ -34,7 +28,7 @@ export class WikisService {
     const knowledge = this.tiddlywikisService.resolveTiddlyWiki(tiddlywikiHtml);
 
     // Create and save wiki first
-    const savedWiki = await this.create({
+    const createdWiki = await this.create({
       id: widiId,
       title: knowledge.title,
       subtitle: knowledge.subtitle,
@@ -42,30 +36,28 @@ export class WikisService {
     });
 
     // Save tiddlers
-    await this.tiddlersService.createMany(savedWiki, knowledge.tiddlers);
+    await this.tiddlersService.createMany(createdWiki, knowledge.tiddlers);
 
-    const templateStr = await readFile(
-      resolve(__dirname, './prompts/tiddlywiki-context-bundle.hbs'),
-      'utf8',
-    );
-    const template = Handlebars.compile(templateStr);
+    const loadedWiki = await this.wikiRepository.findOne({
+      where: { id: createdWiki.id },
+      relations: {
+        tiddlers: true,
+      },
+    });
 
-    const description = await this.llmService.summarize(
-      template({
-        title: knowledge.title,
-        subtitle: knowledge.subtitle,
-        tiddlers: knowledge.tiddlers,
-      }),
-    );
+    if (!loadedWiki) {
+      throw new Error();
+    }
 
-    const embedding = await this.embeddingService.embedding(description);
+    const [description, embedding] =
+      await this.llmService.summarizeWiki(loadedWiki);
 
-    savedWiki.description = description;
-    savedWiki.embedding = embedding;
+    loadedWiki.description = description;
+    loadedWiki.embedding = embedding;
 
-    await this.wikiRepository.save(savedWiki);
+    await this.wikiRepository.save(loadedWiki);
 
-    return savedWiki;
+    return loadedWiki;
   }
 
   async findOne(wikiId: string): Promise<Wiki | null> {

@@ -8,15 +8,42 @@ import type {
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import Handlebars from 'handlebars';
+
+import type { Wiki } from '../wikis/wiki.entity';
+import { EmbeddingService } from '../embedding/embedding.service';
 
 @Injectable()
 export class LlmService {
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
+    private readonly embeddingService: EmbeddingService,
   ) {}
 
-  async summarize(content: string): Promise<string> {
+  public async summarizeWiki(
+    wiki: Wiki,
+  ): Promise<[abstract: string, embedding: number[]]> {
+    const templateStr = await readFile(
+      resolve(__dirname, './prompts/tiddlywiki-context-bundle.hbs'),
+      'utf8',
+    );
+    const template = Handlebars.compile(templateStr);
+
+    const abstract = await this.summarizeFromBundle(
+      template({
+        title: wiki.title,
+        subtitle: wiki.subtitle,
+        tiddlers: wiki.tiddlers,
+      }),
+    );
+
+    const embedding = await this.embeddingService.embedding(abstract);
+
+    return [abstract, embedding];
+  }
+
+  private async summarizeFromBundle(content: string): Promise<string> {
     const systemPrompts = await readFile(
       resolve(__dirname, './prompts/summarizer.md'),
       'utf8',
