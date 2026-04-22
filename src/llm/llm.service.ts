@@ -21,13 +21,11 @@ export class LlmService {
       resolve(__dirname, './prompts/summarizer.md'),
       'utf8',
     );
-    const model = this.configService.get<string>('common_llm.embedding.model')!;
+    const model = this.configService.get<string>('openai.common_llm.model')!;
     const baseURL = this.configService.get<string>(
-      'common_llm.embedding.api_base',
+      'openai.common_llm.api_base',
     )!;
-    const apiKey = this.configService.get<string>(
-      'common_llm.embedding.api_key',
-    )!;
+    const apiKey = this.configService.get<string>('openai.common_llm.api_key')!;
     const request: ChatCompletionCreateParamsBase = {
       model,
       messages: [
