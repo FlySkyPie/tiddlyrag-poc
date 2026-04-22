@@ -33,6 +33,7 @@ export class WikisService {
       title: knowledge.title,
       subtitle: knowledge.subtitle,
       description: `Wiki for ${knowledge.title}`,
+      embedding: [0], // placeholder
     });
 
     // Save tiddlers
