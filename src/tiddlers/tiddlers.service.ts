@@ -1,5 +1,6 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
+import { toSql } from 'pgvector';
 
 import type { Tiddler as TwTiddler } from '../tiddywiki/interfaces/tiddler.dto';
 import { Wiki } from '../wikis/wiki.entity';
@@ -113,16 +114,20 @@ export class TiddlersService {
 
   async queryByVector(
     wikiId: string,
-    embedding: number[],
+    embeddingVec: number[],
     limit: number = 5,
-  ): Promise<Tiddler[]> {
-    return this.tiddlerRepository
-      .createQueryBuilder('tiddler')
-      .innerJoin('tiddler.wiki', 'wiki')
-      .where('wiki.id = :wikiId', { wikiId })
-      .orderBy('tiddler.embedding <-> :embedding')
-      .setParameters({ embedding })
-      .limit(limit)
-      .getMany();
+  ): Promise<Pick<Tiddler, 'title' | 'text'>[]> {
+    return (
+      this.tiddlerRepository
+        .createQueryBuilder('tiddler')
+        .select(['tiddler.title', 'tiddler.text'])
+        .innerJoin('tiddler.wiki', 'wiki')
+        .where('wiki.id = :wikiId', { wikiId })
+        .orderBy('tiddler.embedding <-> :embedding::vector')
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        .setParameters({ embedding: toSql(embeddingVec) })
+        .limit(limit)
+        .getMany()
+    );
   }
 }
