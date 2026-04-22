@@ -18,6 +18,9 @@ export class Wiki {
   @Column('text')
   description: string;
 
+  @Column('vector')
+  embedding: number[];
+
   @OneToMany(() => Tiddler, (tiddler) => tiddler.wiki)
   tiddlers: Tiddler[];
 }

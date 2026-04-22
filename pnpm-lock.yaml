@@ -29,6 +29,9 @@ importers:
       axios:
         specifier: ^1.15.1
         version: 1.15.1
+      handlebars:
+        specifier: ^4.7.9
+        version: 4.7.9
       openai:
         specifier: ^6.34.0
         version: 6.34.0

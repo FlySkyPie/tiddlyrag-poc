@@ -1,8 +1,14 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 
-import { TiddlersService } from '../tiddlers/tiddlers.service';
-import { TiddlywikisService } from '../tiddywiki/tiddywiki.service';
+import type { Repository } from 'typeorm';
+import { Injectable, Inject } from '@nestjs/common';
+import Handlebars from 'handlebars';
+
+import type { TiddlersService } from '../tiddlers/tiddlers.service';
+import type { TiddlywikisService } from '../tiddywiki/tiddywiki.service';
+import type { LlmService } from '../llm/llm.service';
+import type { EmbeddingService } from '../embedding/embedding.service';
 
 import { Wiki } from './wiki.entity';
 
@@ -13,6 +19,8 @@ export class WikisService {
     private wikiRepository: Repository<Wiki>,
     private readonly tiddlywikisService: TiddlywikisService,
     private readonly tiddlersService: TiddlersService,
+    private readonly llmService: LlmService,
+    private readonly embeddingService: EmbeddingService,
   ) {}
 
   async create(wiki: Partial<Wiki>): Promise<Wiki> {
@@ -35,6 +43,27 @@ export class WikisService {
 
     // Save tiddlers
     await this.tiddlersService.createMany(savedWiki, knowledge.tiddlers);
+
+    const templateStr = await readFile(
+      resolve(__dirname, './prompts/tiddlywiki-context-bundle.hbs'),
+      'utf8',
+    );
+    const template = Handlebars.compile(templateStr);
+
+    const description = await this.llmService.summarize(
+      template({
+        title: knowledge.title,
+        subtitle: knowledge.subtitle,
+        tiddlers: knowledge.tiddlers,
+      }),
+    );
+
+    const embedding = await this.embeddingService.embedding(description);
+
+    savedWiki.description = description;
+    savedWiki.embedding = embedding;
+
+    await this.wikiRepository.save(savedWiki);
 
     return savedWiki;
   }

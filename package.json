@@ -27,6 +27,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.3.0",
     "axios": "^1.15.1",
+    "handlebars": "^4.7.9",
     "openai": "^6.34.0",
     "pg": "^8.20.0",
     "pgvector": "^0.2.1",
