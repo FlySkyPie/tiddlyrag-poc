@@ -1,5 +1,6 @@
 import type { Repository } from 'typeorm';
 import { Injectable, Inject } from '@nestjs/common';
+import { toSql } from 'pgvector';
 
 import { TiddlersService } from '../tiddlers/tiddlers.service';
 import { TiddlywikisService } from '../tiddywiki/tiddywiki.service';
@@ -122,5 +123,22 @@ export class WikisService {
       '$:/core/save/all',
     );
     return html;
+  }
+
+  async queryByVector(
+    embeddingVec: number[],
+    limit: number = 5,
+  ): Promise<Wiki[]> {
+    return (
+      this.wikiRepository
+        .createQueryBuilder('wiki')
+        .select(['wiki.id', 'wiki.title', 'wiki.subtitle', 'wiki.description'])
+        .loadRelationCountAndMap('wiki.tiddlerCount', 'wiki.tiddlers')
+        .orderBy('wiki.embedding <-> :embedding::vector')
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        .setParameters({ embedding: toSql(embeddingVec) })
+        .limit(limit)
+        .getMany()
+    );
   }
 }

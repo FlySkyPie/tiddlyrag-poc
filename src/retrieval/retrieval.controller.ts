@@ -38,7 +38,11 @@ export class RetrievalController {
   async resolveWiki(
     @Body() resolveWikiParams: ResolveWikiParamsDto,
   ): Promise<ResolveWikiResponseItemDto[]> {
-    throw new Error('Not implemented yet');
+    const { query } = resolveWikiParams;
+
+    const embeddingVec = await this.embeddingService.embedding(query);
+
+    return (await this.wikisService.queryByVector(embeddingVec)) as any;
   }
 
   @Post('wikis/:wiki')
