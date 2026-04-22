@@ -3,10 +3,10 @@ import { resolve } from 'node:path';
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 
-import type { WikisService } from '../wikis/wikis.service';
-import type { EmbeddingService } from '../embedding/embedding.service';
-import type { TiddlersService } from '../tiddlers/tiddlers.service';
-import type { LlmService } from '../llm/llm.service';
+import { WikisService } from '../wikis/wikis.service';
+import { EmbeddingService } from '../embedding/embedding.service';
+import { TiddlersService } from '../tiddlers/tiddlers.service';
+import { LlmService } from '../llm/llm.service';
 
 import { ResolveWikiParamsDto } from './dto/resolve-wiki-params.dto';
 import { QueryTiddlersParamsDto } from './dto/query-tiddlers-params.dto';

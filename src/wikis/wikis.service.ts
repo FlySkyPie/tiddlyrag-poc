@@ -1,9 +1,9 @@
 import type { Repository } from 'typeorm';
 import { Injectable, Inject } from '@nestjs/common';
 
-import type { TiddlersService } from '../tiddlers/tiddlers.service';
-import type { TiddlywikisService } from '../tiddywiki/tiddywiki.service';
-import type { LlmService } from '../llm/llm.service';
+import { TiddlersService } from '../tiddlers/tiddlers.service';
+import { TiddlywikisService } from '../tiddywiki/tiddywiki.service';
+import { LlmService } from '../llm/llm.service';
 
 import { Wiki } from './wiki.entity';
 
