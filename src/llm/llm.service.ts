@@ -1,3 +1,6 @@
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
+
 import type {
   ChatCompletion,
   ChatCompletionCreateParamsBase,
@@ -14,6 +17,10 @@ export class LlmService {
   ) {}
 
   async summarize(content: string): Promise<string> {
+    const systemPrompts = await readFile(
+      resolve(__dirname, './prompts/summarizer.md'),
+      'utf8',
+    );
     const model = this.configService.get<string>('common_llm.embedding.model')!;
     const baseURL = this.configService.get<string>(
       'common_llm.embedding.api_base',
@@ -26,7 +33,7 @@ export class LlmService {
       messages: [
         {
           role: 'system',
-          content: '',
+          content: systemPrompts,
         },
         {
           role: 'user',
