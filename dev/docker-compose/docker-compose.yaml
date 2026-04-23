@@ -15,7 +15,7 @@ services:
       timeout: 10s
       retries: 5
 
-  llama-cpp:
+  embedding:
     image: ghcr.io/ggml-org/llama.cpp:server-vulkan-b8248
     restart: always
     devices:
@@ -24,27 +24,17 @@ services:
       - 8080:8080
     entrypoint: /app/llama-server
     volumes:
-      - llama-cpp-cache:/root/.cache/llama.cpp
-    command:
-      - --hf-repo
-      - Qwen/Qwen3-Embedding-8B-GGUF
-      - --hf-file
-      - Qwen3-Embedding-8B-Q6_K.gguf
-      - --embeddings
-      - --pooling
-      - mean
-      - --ctx-size
-      - "8192"
-      - --batch-size
-      - "4096"
-      - --ubatch-size
-      - "8192"
-      - --gpu-layers
-      - "999"
-      # - --no-mmap
-      - --flash-attn
-      - on
-      - --no-webui
+      - embedding-cache:/root/.cache/llama.cpp
+    environment:
+      - LLAMA_ARG_HF_REPO=Qwen/Qwen3-Embedding-4B-GGUF
+      - LLAMA_ARG_HF_FILE=Qwen3-Embedding-4B-Q6_K.gguf
+      - LLAMA_ARG_EMBEDDINGS=enabled
+      - LLAMA_ARG_POOLING=mean
+      - LLAMA_ARG_CTX_SIZE=20480
+      - LLAMA_ARG_WEBUI=disabled
+      - LLAMA_ARG_N_GPU_LAYERS=all
+      - LLAMA_ARG_BATCH=8192
+      - LLAMA_ARG_UBATCH=4096
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 10s
@@ -53,5 +43,6 @@ services:
 
 volumes:
   pgvector:
-  llama-cpp-cache:
+  embedding-cache:
+  llm-cache:
 
