@@ -1,6 +1,15 @@
 import { Selectable, Insertable, Updateable } from 'kysely';
 
-export interface TiddlerTable {}
+export interface TiddlerTable {
+  id: number;
+  title: string;
+  type: string | null;
+  text: string;
+  tags: string[];
+  meta: Record<string, unknown>;
+  embedding: number[];
+  wiki_id: number;
+}
 
 export type Tiddler = Selectable<TiddlerTable>;
 
