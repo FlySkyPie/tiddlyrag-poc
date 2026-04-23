@@ -1,10 +1,12 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { toSql } from 'pgvector';
+import { Kysely } from 'kysely';
 
 import type { Tiddler as TwTiddler } from '../tiddywiki/interfaces/tiddler.dto';
 import { Wiki } from '../wikis/wiki.entity';
 import { EmbeddingService } from '../embedding/embedding.service';
+import { Database } from '../database/interfaces/database';
 
 import { Tiddler } from './tiddler.entity';
 
@@ -15,6 +17,8 @@ export class TiddlersService {
     private tiddlerRepository: Repository<Tiddler>,
     @Inject('WIKI_REPOSITORY')
     private wikiRepository: Repository<Wiki>,
+
+    @Inject('KYSELY_DB') private db: Kysely<Database>,
 
     private readonly embeddingService: EmbeddingService,
   ) {}
