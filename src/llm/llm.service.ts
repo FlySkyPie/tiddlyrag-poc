@@ -10,20 +10,19 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Handlebars from 'handlebars';
 
-import type { Wiki } from '../wikis/wiki.entity';
-import { EmbeddingService } from '../embedding/embedding.service';
+import type { TiddywikiKnowledge } from '../tiddywiki/interfaces/tiddywiki-knowledge.dto';
 
 @Injectable()
 export class LlmService {
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
-    private readonly embeddingService: EmbeddingService,
   ) {}
 
-  public async summarizeWiki(
-    wiki: Wiki,
-  ): Promise<[abstract: string, embedding: number[]]> {
+  /**
+   * Summarize Tiddlers from a wiki into shorter abstract.
+   */
+  public async summarizeWiki(wiki: TiddywikiKnowledge): Promise<string> {
     const templateStr = await readFile(
       resolve(__dirname, './prompts/tiddlywiki-context-bundle.hbs'),
       'utf8',
@@ -38,9 +37,7 @@ export class LlmService {
       }),
     );
 
-    const embedding = await this.embeddingService.embedding(abstract);
-
-    return [abstract, embedding];
+    return abstract;
   }
 
   private async summarizeFromBundle(content: string): Promise<string> {

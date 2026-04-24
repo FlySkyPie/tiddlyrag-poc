@@ -8,6 +8,7 @@ import type { Database } from '../database/interfaces/database';
 import { TiddlersService } from '../tiddlers/tiddlers.service';
 import { TiddlywikisService } from '../tiddywiki/tiddywiki.service';
 import { LlmService } from '../llm/llm.service';
+import { EmbeddingService } from '../embedding/embedding.service';
 
 import { Wiki } from './wiki.entity';
 import { WikiSummaryDto } from './dto/wiki-summary.dto';
@@ -22,6 +23,7 @@ export class WikisService {
     private readonly tiddlywikisService: TiddlywikisService,
     private readonly tiddlersService: TiddlersService,
     private readonly llmService: LlmService,
+    private readonly embeddingService: EmbeddingService,
   ) {}
 
   async create(wiki: Partial<Wiki>): Promise<Wiki> {
@@ -57,8 +59,8 @@ export class WikisService {
       throw new Error();
     }
 
-    const [description, embedding] =
-      await this.llmService.summarizeWiki(loadedWiki);
+    const description = await this.llmService.summarizeWiki(knowledge);
+    const embedding = await this.embeddingService.embedding(description);
 
     loadedWiki.description = description;
     loadedWiki.embedding = embedding;
