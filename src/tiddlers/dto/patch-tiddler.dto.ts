@@ -2,7 +2,7 @@ import { ApiProperty, PartialType } from '@nestjs/swagger';
 
 import { CreateTiddlerDto } from './create-tiddler';
 
-export class UpdateTiddlerDto extends PartialType(CreateTiddlerDto) {
+export class PatchTiddlerDto extends PartialType(CreateTiddlerDto) {
   @ApiProperty({
     description: 'Title of the Tiddler, unique within a Wiki',
     format: 'string',
