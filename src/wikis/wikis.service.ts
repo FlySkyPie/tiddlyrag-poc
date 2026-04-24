@@ -2,7 +2,7 @@ import type { Repository } from 'typeorm';
 import { Injectable, Inject } from '@nestjs/common';
 import { InjectKysely } from 'nestjs-kysely';
 import { Kysely } from 'kysely';
-import { toSql } from 'pgvector';
+import { l2Distance } from 'pgvector/kysely';
 
 import type { Database } from '../database/interfaces/database';
 import { TiddlersService } from '../tiddlers/tiddlers.service';
@@ -95,13 +95,10 @@ export class WikisService {
   }
 
   async remove(widiId: string): Promise<void> {
-    const wiki = await this.wikiRepository.findOne({
-      where: { id: widiId },
-    });
-    if (!wiki) {
-      throw new Error(`The wiki not found: ${widiId}`);
-    }
-    await this.wikiRepository.remove(wiki);
+    await this.db
+      .deleteFrom('wiki')
+      .where('wiki.id', '=', widiId)
+      .executeTakeFirst();
   }
 
   async findTiddlyWiki(wikiId: string): Promise<string> {
@@ -150,17 +147,29 @@ export class WikisService {
   async queryByVector(
     embeddingVec: number[],
     limit: number = 5,
-  ): Promise<Wiki[]> {
-    return (
-      this.wikiRepository
-        .createQueryBuilder('wiki')
-        .select(['wiki.id', 'wiki.title', 'wiki.subtitle', 'wiki.description'])
-        .loadRelationCountAndMap('wiki.tiddlerCount', 'wiki.tiddlers')
-        .orderBy('wiki.embedding <-> :embedding::vector')
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        .setParameters({ embedding: toSql(embeddingVec) })
-        .limit(limit)
-        .getMany()
-    );
+  ): Promise<WikiSummaryDto[]> {
+    const subquery = this.db
+      .selectFrom('wiki')
+      .select(['id', 'uid', 'title', 'subtitle', 'description'])
+      .orderBy(l2Distance('wiki.embedding', embeddingVec))
+      .limit(limit);
+
+    const results = await this.db
+      .selectFrom(subquery.as('w'))
+      .leftJoin('tiddler', 'tiddler.wikiUid', 'w.uid')
+      .select(({ fn }) => [
+        'w.id',
+        'w.title',
+        'w.subtitle',
+        'w.description',
+        fn.count('tiddler.id').as('tiddlerCount'),
+      ])
+      .groupBy(['w.id', 'w.title', 'w.subtitle', 'w.description'])
+      .execute();
+
+    return results.map((row) => ({
+      ...row,
+      tiddlerCount: Number(row.tiddlerCount),
+    }));
   }
 }
