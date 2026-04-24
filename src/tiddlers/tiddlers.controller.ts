@@ -7,9 +7,10 @@ import {
   Param,
   Body,
 } from '@nestjs/common';
+
 import { TiddlersService } from './tiddlers.service';
 import { Tiddler } from './tiddler.entity';
-import { Wiki } from '../wikis/wiki.entity';
+import { CreateTiddlerDto } from './dto/create-tiddler';
 
 @Controller('wikis/:wiki/tiddlers')
 export class TiddlersController {
@@ -18,13 +19,9 @@ export class TiddlersController {
   @Post()
   async createTiddler(
     @Param('wiki') wikiId: string,
-    @Body() createTiddlerDto: Partial<Tiddler>,
-  ): Promise<Tiddler> {
-    const wiki = { id: wikiId } as Wiki;
-    const tiddlers = await this.tiddlersService.create([
-      { ...createTiddlerDto, wiki },
-    ]);
-    return tiddlers[0];
+    @Body() createTiddlerDto: CreateTiddlerDto,
+  ): Promise<any> {
+    return this.tiddlersService.create(wikiId, createTiddlerDto);
   }
 
   @Get()

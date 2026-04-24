@@ -2,6 +2,7 @@ import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { toSql } from 'pgvector';
 import { Kysely } from 'kysely';
+import { InjectKysely } from 'nestjs-kysely';
 
 import type { Tiddler as TwTiddler } from '../tiddywiki/interfaces/tiddler.dto';
 import { Wiki } from '../wikis/wiki.entity';
@@ -9,6 +10,7 @@ import { EmbeddingService } from '../embedding/embedding.service';
 import { Database } from '../database/interfaces/database';
 
 import { Tiddler } from './tiddler.entity';
+import { CreateTiddlerDto } from './dto/create-tiddler';
 
 @Injectable()
 export class TiddlersService {
@@ -18,13 +20,38 @@ export class TiddlersService {
     @Inject('WIKI_REPOSITORY')
     private wikiRepository: Repository<Wiki>,
 
-    @Inject('KYSELY_DB') private db: Kysely<Database>,
+    @InjectKysely()
+    private readonly db: Kysely<Database>,
 
     private readonly embeddingService: EmbeddingService,
   ) {}
 
-  async create(tiddlers: Partial<Tiddler>[]): Promise<Tiddler[]> {
-    return this.tiddlerRepository.save(tiddlers);
+  async create(wikiId: string, createTiddlerDto: CreateTiddlerDto) {
+    const wiki = await this.db
+      .selectFrom('wiki')
+      .select('uid')
+      .where('id', '=', wikiId)
+      .executeTakeFirst();
+
+    if (!wiki) {
+      throw new Error(`The Wiki not found: ${wikiId}`);
+    }
+
+    const { title, text, meta, tags, type } = createTiddlerDto;
+    return this.db
+      .insertInto('tiddler')
+      .values([
+        {
+          wikiUid: wiki.uid,
+          title,
+          text,
+          meta: { ...meta },
+          tags: tags ?? [],
+          type,
+          embedding: [0], // placeholder
+        },
+      ])
+      .executeTakeFirst();
   }
 
   async createMany(
