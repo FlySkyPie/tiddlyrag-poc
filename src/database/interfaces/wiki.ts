@@ -1,7 +1,7 @@
-import { Selectable, Insertable, Updateable } from 'kysely';
+import { Selectable, Insertable, Updateable, Generated } from 'kysely';
 
 export interface WikiTable {
-  uid: number;
+  uid: Generated<number>;
   id: string;
   title: string;
   subtitle: string;

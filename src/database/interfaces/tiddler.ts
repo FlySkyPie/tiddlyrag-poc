@@ -1,7 +1,7 @@
-import { Selectable, Insertable, Updateable } from 'kysely';
+import { Selectable, Insertable, Updateable, Generated } from 'kysely';
 
 export interface TiddlerTable {
-  id: number;
+  id: Generated<number>;
   title: string;
   type: string | null;
   text: string;
