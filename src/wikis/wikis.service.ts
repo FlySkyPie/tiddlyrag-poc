@@ -75,14 +75,23 @@ export class WikisService {
   }
 
   async findAll(): Promise<WikiSummaryDto[]> {
-    /**
-     * @todo Add `tiddlerCount`.
-     */
-    /* @ts-expect-error */
-    return await this.db
+    const results = await this.db
       .selectFrom('wiki')
-      .select(['wiki_id as id', 'title', 'subtitle', 'description'])
+      .leftJoin('tiddler', 'tiddler.wiki_id', 'wiki.id')
+      .select([
+        'wiki.wiki_id as id',
+        'wiki.title',
+        'wiki.subtitle',
+        'wiki.description',
+      ])
+      .select((eb) => eb.fn.count('tiddler.id').as('tiddlerCount'))
+      .groupBy('wiki.id')
       .execute();
+
+    return results.map((row) => ({
+      ...row,
+      tiddlerCount: Number(row.tiddlerCount),
+    }));
   }
 
   async remove(widiId: string): Promise<void> {
