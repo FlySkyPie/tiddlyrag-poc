@@ -8,7 +8,7 @@ export interface TiddlerTable {
   tags: string[];
   meta: Record<string, unknown>;
   embedding: number[];
-  wiki_id: number;
+  wikiUid: number;
 }
 
 export type Tiddler = Selectable<TiddlerTable>;

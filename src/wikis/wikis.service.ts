@@ -77,15 +77,15 @@ export class WikisService {
   async findAll(): Promise<WikiSummaryDto[]> {
     const results = await this.db
       .selectFrom('wiki')
-      .leftJoin('tiddler', 'tiddler.wiki_id', 'wiki.id')
-      .select([
-        'wiki.wiki_id as id',
+      .leftJoin('tiddler', 'tiddler.wikiUid', 'wiki.uid')
+      .select(({ fn }) => [
+        'wiki.id',
         'wiki.title',
         'wiki.subtitle',
         'wiki.description',
+        fn.count('tiddler.id').as('tiddlerCount'),
       ])
-      .select((eb) => eb.fn.count('tiddler.id').as('tiddlerCount'))
-      .groupBy('wiki.id')
+      .groupBy(['wiki.id', 'wiki.title', 'wiki.subtitle', 'wiki.description'])
       .execute();
 
     return results.map((row) => ({

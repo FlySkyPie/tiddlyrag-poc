@@ -1,8 +1,8 @@
 import { Selectable, Insertable, Updateable } from 'kysely';
 
 export interface WikiTable {
-  id: number;
-  wiki_id: string;
+  uid: number;
+  id: string;
   title: string;
   subtitle: string;
   description: string;
