@@ -1,18 +1,24 @@
 import type { Repository } from 'typeorm';
 import { Injectable, Inject } from '@nestjs/common';
+import { InjectKysely } from 'nestjs-kysely';
+import { Kysely } from 'kysely';
 import { toSql } from 'pgvector';
 
+import type { Database } from '../database/interfaces/database';
 import { TiddlersService } from '../tiddlers/tiddlers.service';
 import { TiddlywikisService } from '../tiddywiki/tiddywiki.service';
 import { LlmService } from '../llm/llm.service';
 
 import { Wiki } from './wiki.entity';
+import { WikiSummaryDto } from './dto/wiki-summary.dto';
 
 @Injectable()
 export class WikisService {
   constructor(
     @Inject('WIKI_REPOSITORY')
     private wikiRepository: Repository<Wiki>,
+    @InjectKysely()
+    private readonly db: Kysely<Database>,
     private readonly tiddlywikisService: TiddlywikisService,
     private readonly tiddlersService: TiddlersService,
     private readonly llmService: LlmService,
@@ -68,8 +74,15 @@ export class WikisService {
     });
   }
 
-  async findAll(): Promise<Wiki[]> {
-    return this.wikiRepository.find();
+  async findAll(): Promise<WikiSummaryDto[]> {
+    /**
+     * @todo Add `tiddlerCount`.
+     */
+    /* @ts-expect-error */
+    return await this.db
+      .selectFrom('wiki')
+      .select(['wiki_id as id', 'title', 'subtitle', 'description'])
+      .execute();
   }
 
   async remove(widiId: string): Promise<void> {

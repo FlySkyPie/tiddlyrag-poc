@@ -10,12 +10,17 @@ import {
   Param,
   StreamableFile,
 } from '@nestjs/common';
-import { ApiBody, ApiConsumes, ApiProduces } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOkResponse,
+  ApiProduces,
+} from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 
-import type { Wiki } from './wiki.entity';
 import { WikisService } from './wikis.service';
 import { CreateWikiDto } from './dto/create-wiki.dto';
+import { WikiSummaryDto } from './dto/wiki-summary.dto';
 
 @Controller('wikis')
 export class WikisController {
@@ -44,7 +49,12 @@ export class WikisController {
   }
 
   @Get()
-  async getWikis(): Promise<Wiki[]> {
+  @ApiOkResponse({
+    description: 'List all Wikis.',
+    type: WikiSummaryDto,
+    isArray: true,
+  })
+  async getWikis(): Promise<WikiSummaryDto[]> {
     return this.wikisService.findAll();
   }
 
