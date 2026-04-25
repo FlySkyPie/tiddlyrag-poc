@@ -9,7 +9,6 @@ import { ImportWikiModule } from '../import-wiki/import-wiki.module';
 
 import { WikisController } from './wikis.controller';
 import { WikisService } from './wikis.service';
-import { wikiProviders } from './wiki.providers';
 
 @Module({
   imports: [
@@ -21,7 +20,7 @@ import { wikiProviders } from './wiki.providers';
     ImportWikiModule,
   ],
   controllers: [WikisController],
-  providers: [...wikiProviders, WikisService],
-  exports: [...wikiProviders, WikisService],
+  providers: [WikisService],
+  exports: [WikisService],
 })
 export class WikisModule {}

@@ -6,12 +6,11 @@ import { WikisModule } from '../wikis/wikis.module';
 
 import { TiddlersController } from './tiddlers.controller';
 import { TiddlersService } from './tiddlers.service';
-import { tiddlerProviders } from './tiddler.providers';
 
 @Module({
   imports: [DatabaseModule, EmbeddingModule, forwardRef(() => WikisModule)],
   controllers: [TiddlersController],
-  providers: [...tiddlerProviders, TiddlersService],
+  providers: [TiddlersService],
   exports: [TiddlersService],
 })
 export class TiddlersModule {}
