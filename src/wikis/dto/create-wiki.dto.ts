@@ -11,6 +11,7 @@ export class CreateWikiDto {
   @ApiProperty({
     type: 'string',
     format: 'binary',
+    description: 'The HTML file of a Tiddlywiki.',
   })
   tiddlywiki: Express.Multer.File;
 }

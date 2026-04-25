@@ -6,9 +6,12 @@ import { LlmModule } from '../llm/llm.module';
 import { EmbeddingModule } from '../embedding/embedding.module';
 
 import { ImportWikiController } from './import-wiki.controller';
+import { ImportWikiService } from './import-wiki.service';
 
 @Module({
   imports: [DatabaseModule, TiddlywikisModule, LlmModule, EmbeddingModule],
   controllers: [ImportWikiController],
+  providers: [ImportWikiService],
+  exports: [ImportWikiService],
 })
 export class ImportWikiModule {}

@@ -5,10 +5,7 @@ import { Kysely } from 'kysely';
 import { l2Distance } from 'pgvector/kysely';
 
 import type { Database } from '../database/interfaces/database';
-import { TiddlersService } from '../tiddlers/tiddlers.service';
 import { TiddlywikisService } from '../tiddywiki/tiddywiki.service';
-import { LlmService } from '../llm/llm.service';
-import { EmbeddingService } from '../embedding/embedding.service';
 
 import { Wiki } from './wiki.entity';
 import { WikiSummaryDto } from './dto/wiki-summary.dto';
@@ -21,53 +18,10 @@ export class WikisService {
     @InjectKysely()
     private readonly db: Kysely<Database>,
     private readonly tiddlywikisService: TiddlywikisService,
-    private readonly tiddlersService: TiddlersService,
-    private readonly llmService: LlmService,
-    private readonly embeddingService: EmbeddingService,
   ) {}
 
   async create(wiki: Partial<Wiki>): Promise<Wiki> {
     return this.wikiRepository.save(wiki);
-  }
-
-  async createFromTiddyWiki(
-    widiId: string,
-    tiddlywikiHtml: string,
-  ): Promise<Wiki> {
-    const knowledge = this.tiddlywikisService.resolveTiddlyWiki(tiddlywikiHtml);
-
-    // Create and save wiki first
-    const createdWiki = await this.create({
-      id: widiId,
-      title: knowledge.title,
-      subtitle: knowledge.subtitle,
-      description: `Wiki for ${knowledge.title}`,
-      embedding: [0], // placeholder
-    });
-
-    // Save tiddlers
-    await this.tiddlersService.createMany(createdWiki, knowledge.tiddlers);
-
-    const loadedWiki = await this.wikiRepository.findOne({
-      where: { id: createdWiki.id },
-      relations: {
-        tiddlers: true,
-      },
-    });
-
-    if (!loadedWiki) {
-      throw new Error();
-    }
-
-    const description = await this.llmService.summarizeWiki(knowledge);
-    const embedding = await this.embeddingService.embedding(description);
-
-    loadedWiki.description = description;
-    loadedWiki.embedding = embedding;
-
-    await this.wikiRepository.save(loadedWiki);
-
-    return loadedWiki;
   }
 
   async findOne(wikiId: string): Promise<Wiki | null> {

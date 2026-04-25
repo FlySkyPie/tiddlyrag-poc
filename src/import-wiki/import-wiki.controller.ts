@@ -31,6 +31,12 @@ export class ImportWikiController {
     @UploadedFile() tiddlywiki: Express.Multer.File,
     @Body() createWikiDto: CreateWikiDto,
   ) {
+    /**
+     * DO NOT implement this in POC.
+     * The expected behavior (ideal) of this endpoint is queue the task into background,
+     * and return a task id.
+     * The cost of the implement the behavior is too hight, so DO NOT implement this is POC stage.
+     */
     throw new Error('Not implement yet');
   }
 }

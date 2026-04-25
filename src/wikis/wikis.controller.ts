@@ -18,19 +18,23 @@ import {
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 
+import { ImportWikiService } from '../import-wiki/import-wiki.service';
+
 import { WikisService } from './wikis.service';
 import { CreateWikiDto } from './dto/create-wiki.dto';
 import { WikiSummaryDto } from './dto/wiki-summary.dto';
 
 @Controller('wikis')
 export class WikisController {
-  constructor(private readonly wikisService: WikisService) {}
+  constructor(
+    private readonly wikisService: WikisService,
+    private readonly importWikiService: ImportWikiService,
+  ) {}
 
   @Post()
   @UseInterceptors(FileInterceptor('tiddlywiki'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
-    description: 'The HTML file of a Tiddlywiki.',
     type: CreateWikiDto,
     encoding: {
       tiddlywiki: {
@@ -42,7 +46,7 @@ export class WikisController {
     @UploadedFile() tiddlywiki: Express.Multer.File,
     @Body() createWikiDto: CreateWikiDto,
   ) {
-    return this.wikisService.createFromTiddyWiki(
+    return this.importWikiService.simpleImportFromTiddyWiki(
       createWikiDto.id,
       tiddlywiki.buffer.toString(),
     );
