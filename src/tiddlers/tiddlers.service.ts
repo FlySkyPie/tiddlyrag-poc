@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Kysely } from 'kysely';
 import { InjectKysely } from 'nestjs-kysely';
-import { l2Distance } from 'pgvector/kysely';
 
 import { Database } from '../database/interfaces/database';
 
@@ -127,36 +126,6 @@ export class TiddlersService {
       }
 
       await trx.deleteFrom('tiddler').where('id', '=', tiddlerId).execute();
-    });
-  }
-
-  async queryByVector(
-    wikiId: string,
-    embeddingVec: number[],
-    limit: number = 5,
-  ): Promise<TiddlerResponseDto[] | null> {
-    return await this.db.transaction().execute(async (trx) => {
-      const wiki = await trx
-        .selectFrom('wiki')
-        .select(['uid'])
-        .where('id', '=', wikiId)
-        .executeTakeFirst();
-      if (!wiki) {
-        return null;
-      }
-
-      const tiddlers = await this.db
-        .selectFrom('tiddler')
-        .select(['id', 'title', 'text', 'meta', 'tags', 'type'])
-        .where('wikiUid', '=', wiki.uid)
-        .orderBy(l2Distance('embedding', embeddingVec))
-        .limit(limit)
-        .execute();
-
-      return tiddlers.map((tiddler) => ({
-        ...tiddler,
-        wikiId,
-      }));
     });
   }
 }

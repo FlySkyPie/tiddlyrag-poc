@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { l2Distance } from 'pgvector/kysely';
+import { Kysely } from 'kysely';
+import { InjectKysely } from 'nestjs-kysely';
 
 import { EmbeddingService } from '../embedding/embedding.service';
-import { TiddlersService } from '../tiddlers/tiddlers.service';
-import { WikisService } from '../wikis/wikis.service';
+import { Database } from '../database/interfaces/database';
 
 import { QueryTiddlersResponseItemDto } from './dto/query-tiddlers-response-item.dto';
 import { ResolveWikiResponseItemDto } from './dto/resolve-wiki-response-item.dto';
@@ -10,20 +12,35 @@ import { ResolveWikiResponseItemDto } from './dto/resolve-wiki-response-item.dto
 @Injectable()
 export class RetrievalService {
   constructor(
-    private readonly wikisService: WikisService,
     private readonly embeddingService: EmbeddingService,
-    private readonly tiddlersService: TiddlersService,
+    @InjectKysely()
+    private readonly db: Kysely<Database>,
   ) {}
 
   async resolveWiki(query: string): Promise<ResolveWikiResponseItemDto[]> {
     const embeddingVec = await this.embeddingService.embedding(query);
-    const result = await this.wikisService.queryByVector(embeddingVec);
+
+    const subquery = this.db
+      .selectFrom('wiki')
+      .select(['id', 'uid', 'title', 'subtitle'])
+      .orderBy(l2Distance('wiki.embedding', embeddingVec))
+      .limit(5);
+
+    const result = await this.db
+      .selectFrom(subquery.as('w'))
+      .leftJoin('tiddler', 'tiddler.wikiUid', 'w.uid')
+      .select(({ fn }) => [
+        'w.id as wikiId',
+        'w.title',
+        fn.count('tiddler.id').as('tiddlerCount'),
+      ])
+      .groupBy(['w.id', 'w.title', 'w.subtitle'])
+      .execute();
 
     return result.map<ResolveWikiResponseItemDto>(
-      ({ title, id, tiddlerCount }) => ({
-        title,
-        wikiId: id,
-        tiddlerCount,
+      ({ tiddlerCount, ...rest }) => ({
+        ...rest,
+        tiddlerCount: Number(tiddlerCount),
         score: 100, // fake data
       }),
     );
@@ -34,10 +51,29 @@ export class RetrievalService {
     query: string,
   ): Promise<QueryTiddlersResponseItemDto[]> {
     const embeddingVec = await this.embeddingService.embedding(query);
-    const tiddlers = await this.tiddlersService.queryByVector(
-      wikiId,
-      embeddingVec,
-    );
+    const tiddlers = await this.db.transaction().execute(async (trx) => {
+      const wiki = await trx
+        .selectFrom('wiki')
+        .select(['uid'])
+        .where('id', '=', wikiId)
+        .executeTakeFirst();
+      if (!wiki) {
+        return null;
+      }
+
+      const tiddlers = await this.db
+        .selectFrom('tiddler')
+        .select(['title', 'text'])
+        .where('wikiUid', '=', wiki.uid)
+        .orderBy(l2Distance('embedding', embeddingVec))
+        .limit(5)
+        .execute();
+
+      return tiddlers.map((tiddler) => ({
+        ...tiddler,
+        wikiId,
+      }));
+    });
     if (!tiddlers) {
       return [];
     }

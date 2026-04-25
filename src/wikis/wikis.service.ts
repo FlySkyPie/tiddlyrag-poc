@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectKysely } from 'nestjs-kysely';
 import { Kysely } from 'kysely';
-import { l2Distance } from 'pgvector/kysely';
 
 import type { Database } from '../database/interfaces/database';
 import { TiddlywikisService } from '../tiddywiki/tiddywiki.service';
@@ -123,34 +122,5 @@ export class WikisService {
       '$:/core/save/all',
     );
     return html;
-  }
-
-  async queryByVector(
-    embeddingVec: number[],
-    limit: number = 5,
-  ): Promise<WikiSummaryDto[]> {
-    const subquery = this.db
-      .selectFrom('wiki')
-      .select(['id', 'uid', 'title', 'subtitle', 'description'])
-      .orderBy(l2Distance('wiki.embedding', embeddingVec))
-      .limit(limit);
-
-    const results = await this.db
-      .selectFrom(subquery.as('w'))
-      .leftJoin('tiddler', 'tiddler.wikiUid', 'w.uid')
-      .select(({ fn }) => [
-        'w.id',
-        'w.title',
-        'w.subtitle',
-        'w.description',
-        fn.count('tiddler.id').as('tiddlerCount'),
-      ])
-      .groupBy(['w.id', 'w.title', 'w.subtitle', 'w.description'])
-      .execute();
-
-    return results.map((row) => ({
-      ...row,
-      tiddlerCount: Number(row.tiddlerCount),
-    }));
   }
 }
