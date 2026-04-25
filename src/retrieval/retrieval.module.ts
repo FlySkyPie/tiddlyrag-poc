@@ -6,9 +6,11 @@ import { TiddlersModule } from '../tiddlers/tiddlers.module';
 import { LlmModule } from '../llm/llm.module';
 
 import { RetrievalController } from './retrieval.controller';
+import { RetrievalService } from './retrieval.service';
 
 @Module({
   imports: [WikisModule, EmbeddingModule, TiddlersModule, LlmModule],
+  providers: [RetrievalService],
   controllers: [RetrievalController],
 })
 export class RetrievalModule {}

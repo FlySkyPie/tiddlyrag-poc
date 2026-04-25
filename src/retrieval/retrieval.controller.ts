@@ -4,22 +4,18 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 
 import { WikisService } from '../wikis/wikis.service';
-import { EmbeddingService } from '../embedding/embedding.service';
-import { TiddlersService } from '../tiddlers/tiddlers.service';
-import { LlmService } from '../llm/llm.service';
 
 import { ResolveWikiParamsDto } from './dto/resolve-wiki-params.dto';
 import { QueryTiddlersParamsDto } from './dto/query-tiddlers-params.dto';
 import { ResolveWikiResponseItemDto } from './dto/resolve-wiki-response-item.dto';
 import { QueryTiddlersResponseItemDto } from './dto/query-tiddlers-response-item.dto';
+import { RetrievalService } from './retrieval.service';
 
 @Controller('retrieval')
 export class RetrievalController {
   constructor(
     private readonly wikisService: WikisService,
-    private readonly embeddingService: EmbeddingService,
-    private readonly tiddlersService: TiddlersService,
-    private readonly llmService: LlmService,
+    private readonly retrievalService: RetrievalService,
   ) {}
 
   @Post('wikis')
@@ -39,18 +35,7 @@ export class RetrievalController {
     @Body() resolveWikiParams: ResolveWikiParamsDto,
   ): Promise<ResolveWikiResponseItemDto[]> {
     const { query } = resolveWikiParams;
-
-    const embeddingVec = await this.embeddingService.embedding(query);
-    const result = await this.wikisService.queryByVector(embeddingVec);
-
-    return result.map<ResolveWikiResponseItemDto>(
-      ({ title, id, tiddlerCount }) => ({
-        title,
-        wikiId: id,
-        tiddlerCount,
-        score: 100, // fake data
-      }),
-    );
+    return this.retrievalService.resolveWiki(query);
   }
 
   @Post('wikis/:wiki')
@@ -74,15 +59,6 @@ export class RetrievalController {
       throw new Error(`The wiki not found: ${wikiId}`);
     }
 
-    const embeddingVec = await this.embeddingService.embedding(query);
-    const tiddlers = await this.tiddlersService.queryByVector(
-      wikiId,
-      embeddingVec,
-    );
-    if (!tiddlers) {
-      return [];
-    }
-
-    return tiddlers;
+    return this.retrievalService.queryTiddlers(wikiId, query);
   }
 }
