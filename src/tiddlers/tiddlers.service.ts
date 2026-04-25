@@ -148,6 +148,7 @@ export class TiddlersService {
       const tiddlers = await this.db
         .selectFrom('tiddler')
         .select(['id', 'title', 'text', 'meta', 'tags', 'type'])
+        .where('wikiUid', '=', wiki.uid)
         .orderBy(l2Distance('embedding', embeddingVec))
         .limit(limit)
         .execute();
