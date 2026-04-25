@@ -41,8 +41,16 @@ export class RetrievalController {
     const { query } = resolveWikiParams;
 
     const embeddingVec = await this.embeddingService.embedding(query);
+    const result = await this.wikisService.queryByVector(embeddingVec);
 
-    return (await this.wikisService.queryByVector(embeddingVec)) as any;
+    return result.map<ResolveWikiResponseItemDto>(
+      ({ title, id, tiddlerCount }) => ({
+        title,
+        wikiId: id,
+        tiddlerCount,
+        score: 100, // fake data
+      }),
+    );
   }
 
   @Post('wikis/:wiki')
@@ -67,7 +75,14 @@ export class RetrievalController {
     }
 
     const embeddingVec = await this.embeddingService.embedding(query);
+    const tiddlers = await this.tiddlersService.queryByVector(
+      wikiId,
+      embeddingVec,
+    );
+    if (!tiddlers) {
+      return [];
+    }
 
-    return this.tiddlersService.queryByVector(wikiId, embeddingVec);
+    return tiddlers;
   }
 }

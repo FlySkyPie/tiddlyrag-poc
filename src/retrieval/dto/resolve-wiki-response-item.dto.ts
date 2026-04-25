@@ -15,7 +15,7 @@ export class ResolveWikiResponseItemDto {
   @ApiProperty({
     format: 'number',
   })
-  tiddlers: number;
+  tiddlerCount: number;
 
   @ApiProperty({
     format: 'number',
