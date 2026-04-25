@@ -1,16 +1,14 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 
 import { DatabaseModule } from '../database/database.module';
-import { EmbeddingModule } from '../embedding/embedding.module';
-import { WikisModule } from '../wikis/wikis.module';
 
 import { TiddlersController } from './tiddlers.controller';
 import { TiddlersService } from './tiddlers.service';
 
 @Module({
-  imports: [DatabaseModule, EmbeddingModule, forwardRef(() => WikisModule)],
+  imports: [DatabaseModule],
   controllers: [TiddlersController],
   providers: [TiddlersService],
-  exports: [TiddlersService],
+  exports: [],
 })
 export class TiddlersModule {}
