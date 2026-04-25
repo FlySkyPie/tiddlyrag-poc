@@ -14,6 +14,7 @@ import {
   ApiBody,
   ApiConsumes,
   ApiOkResponse,
+  ApiOperation,
   ApiProduces,
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -32,6 +33,9 @@ export class WikisController {
   ) {}
 
   @Post()
+  @ApiOperation({
+    summary: 'Create a Wiki.',
+  })
   @UseInterceptors(FileInterceptor('tiddlywiki'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -53,6 +57,9 @@ export class WikisController {
   }
 
   @Get()
+  @ApiOperation({
+    summary: 'List all Wikis.',
+  })
   @ApiOkResponse({
     description: 'List all Wikis.',
     type: WikiSummaryDto,
@@ -63,9 +70,12 @@ export class WikisController {
   }
 
   @Get(':wiki')
+  @ApiOperation({
+    summary: 'Download a Wiki as TiddlyWiki.',
+  })
   @ApiProduces('text/html')
   async getWiki(@Param('wiki') wikiId: string): Promise<StreamableFile> {
-    const html = await this.wikisService.findTiddlyWiki(wikiId);
+    const html = await this.wikisService.genTiddlyWiki(wikiId);
     return new StreamableFile(Readable.from(html), {
       type: 'text/html',
       disposition: `attachment; filename="${wikiId}.html"`,
@@ -73,6 +83,9 @@ export class WikisController {
   }
 
   @Delete(':wiki')
+  @ApiOperation({
+    summary: 'Delete a Wiki.',
+  })
   async deleteWiki(@Param('wiki') wikiId: string): Promise<void> {
     return this.wikisService.remove(wikiId);
   }

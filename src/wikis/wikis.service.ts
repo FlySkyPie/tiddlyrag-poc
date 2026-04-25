@@ -1,5 +1,4 @@
-import type { Repository } from 'typeorm';
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectKysely } from 'nestjs-kysely';
 import { Kysely } from 'kysely';
 import { l2Distance } from 'pgvector/kysely';
@@ -7,27 +6,39 @@ import { l2Distance } from 'pgvector/kysely';
 import type { Database } from '../database/interfaces/database';
 import { TiddlywikisService } from '../tiddywiki/tiddywiki.service';
 
-import { Wiki } from './wiki.entity';
 import { WikiSummaryDto } from './dto/wiki-summary.dto';
 
 @Injectable()
 export class WikisService {
   constructor(
-    @Inject('WIKI_REPOSITORY')
-    private wikiRepository: Repository<Wiki>,
     @InjectKysely()
     private readonly db: Kysely<Database>,
     private readonly tiddlywikisService: TiddlywikisService,
   ) {}
 
-  async create(wiki: Partial<Wiki>): Promise<Wiki> {
-    return this.wikiRepository.save(wiki);
-  }
+  async findOne(wikiId: string): Promise<WikiSummaryDto> {
+    const results = await this.db
+      .selectFrom('wiki')
+      .leftJoin('tiddler', 'tiddler.wikiUid', 'wiki.uid')
+      .select(({ fn }) => [
+        'wiki.id',
+        'wiki.title',
+        'wiki.subtitle',
+        'wiki.description',
+        fn.count('tiddler.id').as('tiddlerCount'),
+      ])
+      .groupBy(['wiki.id', 'wiki.title', 'wiki.subtitle', 'wiki.description'])
+      .where('wiki.id', '=', wikiId)
+      .executeTakeFirst();
 
-  async findOne(wikiId: string): Promise<Wiki | null> {
-    return this.wikiRepository.findOne({
-      where: { id: wikiId },
-    });
+    if (!results) {
+      throw new Error(`The Wiki not found: ${wikiId}`);
+    }
+
+    return {
+      ...results,
+      tiddlerCount: Number(results.tiddlerCount),
+    };
   }
 
   async findAll(): Promise<WikiSummaryDto[]> {
@@ -57,18 +68,15 @@ export class WikisService {
       .executeTakeFirst();
   }
 
-  async findTiddlyWiki(wikiId: string): Promise<string> {
-    const wiki = await this.wikiRepository.findOne({
-      relations: {
-        tiddlers: true,
-      },
-      where: {
-        id: wikiId,
-      },
-    });
+  async genTiddlyWiki(wikiId: string): Promise<string> {
+    const wiki = await this.db
+      .selectFrom('wiki')
+      .select(['uid', 'title', 'subtitle'])
+      .where('id', '=', wikiId)
+      .executeTakeFirst();
 
     if (!wiki) {
-      throw new Error(`The wiki not found: ${wikiId}`);
+      throw new Error(`The Wiki not found: ${wikiId}`);
     }
 
     const $tw = this.tiddlywikisService.loadTemplate();
@@ -79,7 +87,14 @@ export class WikisService {
     $tw.wiki.addTiddler(
       new $tw.Tiddler({ text: wiki.subtitle }, { title: '$:/SiteSubtitle' }),
     );
-    wiki.tiddlers.forEach((tiddler) => {
+
+    const tiddlers = await this.db
+      .selectFrom('tiddler')
+      .select(['text', 'text', 'tags', 'meta', 'type', 'title'])
+      .where('wikiUid', '=', wiki.uid)
+      .execute();
+
+    tiddlers.forEach((tiddler) => {
       $tw.wiki.addTiddler(
         new $tw.Tiddler(
           {

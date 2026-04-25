@@ -8,7 +8,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiConsumes, ApiBody, ApiOperation } from '@nestjs/swagger';
 
-import { CreateWikiDto } from './dto/create-wiki.dto';
+import { ImportWikiRequestDto } from './dto/import-wiki-request.dto';
 
 @Controller('import-wiki')
 export class ImportWikiController {
@@ -20,7 +20,7 @@ export class ImportWikiController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     description: 'The HTML file of a Tiddlywiki.',
-    type: CreateWikiDto,
+    type: ImportWikiRequestDto,
     encoding: {
       tiddlywiki: {
         contentType: 'text/html',
@@ -29,7 +29,7 @@ export class ImportWikiController {
   })
   createWiki(
     @UploadedFile() tiddlywiki: Express.Multer.File,
-    @Body() createWikiDto: CreateWikiDto,
+    @Body() createWikiDto: ImportWikiRequestDto,
   ) {
     /**
      * DO NOT implement this in POC.

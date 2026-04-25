@@ -1,7 +1,7 @@
 import 'multer';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateWikiDto {
+export class ImportWikiRequestDto {
   @ApiProperty({
     description: 'Specify uniq id for the wiki in kebab-case.',
     format: 'string',
