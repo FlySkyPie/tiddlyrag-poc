@@ -31,7 +31,7 @@ export class LlmService {
       resolve(__dirname, './prompts/tiddlywiki-context-bundle.hbs'),
       'utf8',
     );
-    const template = Handlebars.compile(templateStr);
+    const template = Handlebars.compile(templateStr, { noEscape: true });
 
     const abstract = await this.summarizeFromBundle(
       template({
