@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectKysely } from 'nestjs-kysely';
-import { Kysely } from 'kysely';
+import { Kysely, sql } from 'kysely';
+import { toSql } from 'pgvector/kysely';
 
 import type { Database } from '../database/interfaces/database';
 import type { Wiki } from '../database/interfaces/wiki';
@@ -37,7 +38,7 @@ export class ImportWikiService {
           title,
           subtitle,
           description: `Wiki for ${title}`,
-          embedding: [0], // placeholder
+          embedding: sql<number[]>`${toSql([0])}`, // placeholder
         },
       ])
       .returning('uid')
@@ -61,7 +62,7 @@ export class ImportWikiService {
             meta: { ...rest },
             tags: tags ?? [],
             type,
-            embedding,
+            embedding: sql<number[]>`${toSql(embedding)}`,
           },
         ])
         .executeTakeFirst();
@@ -78,7 +79,7 @@ export class ImportWikiService {
       .updateTable('wiki')
       .set({
         description,
-        embedding,
+        embedding: sql<number[]>`${toSql(embedding)}`,
       })
       .where('uid', '=', createdWiki.uid)
       .returning(['id', 'uid', 'title', 'subtitle', 'description'])
