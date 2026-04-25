@@ -22,7 +22,7 @@ export class RetrievalService {
 
     const subquery = this.db
       .selectFrom('wiki')
-      .select(['id', 'uid', 'title', 'subtitle'])
+      .select(['id', 'uid', 'title', 'subtitle', 'description'])
       .orderBy(l2Distance('wiki.embedding', embeddingVec))
       .limit(5);
 
@@ -32,9 +32,10 @@ export class RetrievalService {
       .select(({ fn }) => [
         'w.id as wikiId',
         'w.title',
+        'w.description',
         fn.count('tiddler.id').as('tiddlerCount'),
       ])
-      .groupBy(['w.id', 'w.title', 'w.subtitle'])
+      .groupBy(['w.id', 'w.title', 'w.subtitle', 'w.description'])
       .execute();
 
     return result.map<ResolveWikiResponseItemDto>(

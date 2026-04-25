@@ -13,6 +13,11 @@ export class ResolveWikiResponseItemDto {
   wikiId: string;
 
   @ApiProperty({
+    format: 'string',
+  })
+  description: string;
+
+  @ApiProperty({
     format: 'number',
   })
   tiddlerCount: number;
