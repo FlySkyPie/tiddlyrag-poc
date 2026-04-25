@@ -1,98 +1,58 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# TiddlyRAG POC: Basic Use Case
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## What is TiddlyRAG?
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+It's microservice used to providing knowledge about certain domain, and used by a RAG system.
 
-## Description
+## What's the problems that TiddlyRAG trying solve?
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### Reuse RAG preprocessed knowledge
 
-## Project setup
+As is known to everyone (consider you are read this RAG related project, I assume so), RAG would chunking text from input materials, some systems cutting it good and some systems bad, the chunking quality it's highly affect performance of the RAG system.
 
-```bash
-$ pnpm install
-```
+So what if we can transfer knowledge (text chunk) between RAD databases?
 
-## Compile and run the project
+### Better Human Usability
 
-```bash
-# development
-$ pnpm run start
+My definition of `llm.txt` is: a plain text file prepared for LLM, used to providing context.
 
-# watch mode
-$ pnpm run start:dev
+There alot of tools can create, generate, providing `llm.txt`, such as [repomix](https://github.com/yamadashy/repomix), [markitdown](https://github.com/microsoft/markitdown), Context7...put the chunking issue that I mentioned before beside, `llm.txt` it's very hard to read for human.
 
-# production mode
-$ pnpm run start:prod
-```
+Data cleansing is 101 of ETL,the truth of source for RAG can't easily been process by human, that's a problem.
 
-## Run tests
+### TiddlyWiki
 
-```bash
-# unit tests
-$ pnpm run test
+But glad we don't need to reinvent wheel, a perfect solution for knowledge payload; an alternative of `llm.txt` already exist: TiddlyWiki.
 
-# e2e tests
-$ pnpm run test:e2e
+TiddlyWiki is a non-linear personal web notebook, more specificly, it's a single HTML containing both program and data, you can open it as SPA and read or edit notes.
 
-# test coverage
-$ pnpm run test:cov
-```
+The philosophy of TiddlyWiki is very similar to Zettelkasten method, you make many Tiddler (card) in short of conent, and link them. So it present the chunking process naturally. The other hand "It's SPA" solving the problem human can't read or edit data easily.
 
-## Deployment
+Plus, links between Tiddlers implicitly containing Graph information, they would be useful when you want to using Graph based RAG strategy.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+![](./docs/01_knowledge-reuse.webp)
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## What's this POC providing?
 
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
+![](./docs/02_base-use-case.webp)
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+This POC providing a HTTP API used to upload a TiddlyWiki into database, only Tiddlers been tag as `knowledge` would been imported.
 
-## Resources
+Also providing a simple MCP interface allowed you integrate with other LLM tools, the interface design is inspired by Context7.
 
-Check out a few resources that may come in handy when working with NestJS:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## More Information
 
-## Support
+If you interesting about the idea, here are related materials, some of them are blog posts I wrote before.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- [FlySkyPie/tiddlyrag-planning](https://github.com/FlySkyPie/tiddlyrag-planning) (Mandarin)
+  - The GitHub repo used for planning TiddlyRAG.
+- [ODDD](https://flyskypie.github.io/microproject-wikis/oddd.html) (Mandarin)
+  - A TiddlyWiki talking about ODDD (ontology-domain driven design), which a methodology would using TiddlyRAG as infrastructure.
+- [2025-10-06 a idea about using tiddlywiki as llms.txt](https://flyskypie.github.io/blog/2025-10-06_a-idea-about-using-tiddlywiki-as-llmstxt/) (Manderin)
+  - First pmy ublic post talking about the idea.
+- [2026-04-20 Freedom is not free in LLM era](https://flyskypie.github.io/posts/2026-04-20_freeson-isnt-free-in-llm-era/) (Manderin)
+  - One of philosophy of mine is what drives me to invest effort into RAG systems.
+- [2026-03-17 software growing trap with vibe coding](https://flyskypie.github.io/posts/2026-03-17_software-growing-trap/) (Manderin)
+  - Why create RAG to stored domain knowledge is important.
+- [2025-09-09 LLM and robotic arm](https://flyskypie.github.io/posts/2025-09-09_llm-and-robot-arm/) (Manderin)
