@@ -61,11 +61,27 @@ export class WikisService {
     }));
   }
 
-  async remove(widiId: string): Promise<void> {
-    await this.db
-      .deleteFrom('wiki')
-      .where('wiki.id', '=', widiId)
-      .executeTakeFirst();
+  async remove(wikiId: string): Promise<void> {
+    await this.db.transaction().execute(async (trx) => {
+      const wiki = await trx
+        .selectFrom('wiki')
+        .select(['uid'])
+        .where('id', '=', wikiId)
+        .executeTakeFirst();
+      if (!wiki) {
+        return;
+      }
+
+      await trx
+        .deleteFrom('tiddler')
+        .where('wikiUid', '=', wiki.uid)
+        .executeTakeFirst();
+
+      await trx
+        .deleteFrom('wiki')
+        .where('wiki.uid', '=', wiki.uid)
+        .executeTakeFirst();
+    });
   }
 
   async genTiddlyWiki(wikiId: string): Promise<string> {
