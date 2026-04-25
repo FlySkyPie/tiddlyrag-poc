@@ -72,15 +72,9 @@ export class WikisService {
         return;
       }
 
-      await trx
-        .deleteFrom('tiddler')
-        .where('wikiUid', '=', wiki.uid)
-        .executeTakeFirst();
+      await trx.deleteFrom('tiddler').where('wikiUid', '=', wiki.uid).execute();
 
-      await trx
-        .deleteFrom('wiki')
-        .where('wiki.uid', '=', wiki.uid)
-        .executeTakeFirst();
+      await trx.deleteFrom('wiki').where('wiki.uid', '=', wiki.uid).execute();
     });
   }
 

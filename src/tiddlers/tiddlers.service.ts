@@ -1,32 +1,28 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { toSql } from 'pgvector';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Kysely } from 'kysely';
 import { InjectKysely } from 'nestjs-kysely';
+import { l2Distance } from 'pgvector/kysely';
 
-import type { Tiddler as TwTiddler } from '../tiddywiki/interfaces/tiddler.dto';
-import { Wiki } from '../wikis/wiki.entity';
-import { EmbeddingService } from '../embedding/embedding.service';
 import { Database } from '../database/interfaces/database';
 
-import { Tiddler } from './tiddler.entity';
 import { CreateTiddlerDto } from './dto/create-tiddler';
+import { TiddlerResponseDto } from './dto/tiddler-response.dto';
 
 @Injectable()
 export class TiddlersService {
   constructor(
-    @Inject('TIDDLER_REPOSITORY')
-    private tiddlerRepository: Repository<Tiddler>,
-    @Inject('WIKI_REPOSITORY')
-    private wikiRepository: Repository<Wiki>,
-
     @InjectKysely()
     private readonly db: Kysely<Database>,
-
-    private readonly embeddingService: EmbeddingService,
   ) {}
 
-  async create(wikiId: string, createTiddlerDto: CreateTiddlerDto) {
+  /**
+   * When a content of Wiki (Tidder) been update, embedding and abstract should also been update,
+   * but this method is for POC, so the process is ignored for now.
+   */
+  async simpleCreate(
+    wikiId: string,
+    createTiddlerDto: CreateTiddlerDto,
+  ): Promise<TiddlerResponseDto> {
     const wiki = await this.db
       .selectFrom('wiki')
       .select('uid')
@@ -38,7 +34,7 @@ export class TiddlersService {
     }
 
     const { title, text, meta, tags, type } = createTiddlerDto;
-    return this.db
+    const tiddler = await this.db
       .insertInto('tiddler')
       .values([
         {
@@ -51,114 +47,115 @@ export class TiddlersService {
           embedding: [0], // placeholder
         },
       ])
+      .returning(['id', 'title', 'text', 'meta', 'tags', 'type'])
       .executeTakeFirst();
-  }
 
-  async createMany(
-    wiki: Wiki,
-    twTiddlers: Partial<TwTiddler>[],
-  ): Promise<Tiddler[]> {
-    const payload: Partial<Tiddler>[] = [];
-
-    for (let index = 0; index < twTiddlers.length; index++) {
-      const { title, text, type, tags, ...rest } = twTiddlers[index];
-      const embedding = await this.embeddingService.embedding(text ?? '');
-
-      payload.push({
-        title,
-        text,
-        type,
-        tags,
-        embedding,
-        meta: rest,
-        wiki,
-      });
-    }
-
-    return this.tiddlerRepository.save(payload);
-  }
-
-  async findAll(wikiId: string): Promise<Tiddler[]> {
-    const wiki = await this.wikiRepository.findOne({
-      where: { id: wikiId },
-    });
-    if (!wiki) {
-      throw new NotFoundException(`Wiki not found: ${wikiId}`);
-    }
-    return this.tiddlerRepository.find({
-      where: { wiki: { id: wikiId } },
-    });
-  }
-
-  async findOne(wikiId: string, title: string): Promise<Tiddler> {
-    const wiki = await this.wikiRepository.findOne({
-      where: { id: wikiId },
-    });
-    if (!wiki) {
-      throw new NotFoundException(`Wiki not found: ${wikiId}`);
-    }
-    const tiddler = await this.tiddlerRepository.findOne({
-      where: { wiki: { id: wikiId }, title },
-    });
     if (!tiddler) {
-      throw new NotFoundException(`Tiddler not found: ${title}`);
+      throw new Error();
     }
-    return tiddler;
+
+    return {
+      ...tiddler,
+      wikiId,
+    };
   }
 
-  async update(
+  async findAll(wikiId: string): Promise<TiddlerResponseDto[] | null> {
+    return await this.db.transaction().execute(async (trx) => {
+      const wiki = await trx
+        .selectFrom('wiki')
+        .select(['uid'])
+        .where('id', '=', wikiId)
+        .executeTakeFirst();
+      if (!wiki) {
+        return null;
+      }
+
+      const tiddlers = await trx
+        .selectFrom('tiddler')
+        .select(['id', 'title', 'text', 'meta', 'tags', 'type'])
+        .where('wikiUid', '=', wiki.uid)
+        .execute();
+
+      return tiddlers.map((tiddler) => ({
+        ...tiddler,
+        wikiId,
+      }));
+    });
+  }
+
+  async findOne(
     wikiId: string,
-    title: string,
-    updateData: Partial<Tiddler>,
-  ): Promise<Tiddler> {
-    const wiki = await this.wikiRepository.findOne({
-      where: { id: wikiId },
+    tiddlerId: number,
+  ): Promise<TiddlerResponseDto | null> {
+    return await this.db.transaction().execute(async (trx) => {
+      const wiki = await trx
+        .selectFrom('wiki')
+        .select(['uid'])
+        .where('id', '=', wikiId)
+        .executeTakeFirst();
+      if (!wiki) {
+        return null;
+      }
+
+      const tiddler = await trx
+        .selectFrom('tiddler')
+        .select(['id', 'title', 'text', 'meta', 'tags', 'type'])
+        .where('id', '=', tiddlerId)
+        .executeTakeFirst();
+
+      if (!tiddler) {
+        return null;
+      }
+
+      return {
+        ...tiddler,
+        wikiId,
+      };
     });
-    if (!wiki) {
-      throw new NotFoundException(`Wiki not found: ${wikiId}`);
-    }
-    const tiddler = await this.tiddlerRepository.findOne({
-      where: { wiki: { id: wikiId }, title },
-    });
-    if (!tiddler) {
-      throw new NotFoundException(`Tiddler not found: ${title}`);
-    }
-    Object.assign(tiddler, updateData);
-    return this.tiddlerRepository.save(tiddler);
   }
 
-  async delete(wikiId: string, title: string): Promise<void> {
-    const wiki = await this.wikiRepository.findOne({
-      where: { id: wikiId },
+  async delete(wikiId: string, tiddlerId: number): Promise<void> {
+    await this.db.transaction().execute(async (trx) => {
+      const wiki = await trx
+        .selectFrom('wiki')
+        .select(['uid'])
+        .where('id', '=', wikiId)
+        .executeTakeFirst();
+      if (!wiki) {
+        throw new NotFoundException(`Wiki not found: ${wikiId}`);
+      }
+
+      await trx.deleteFrom('tiddler').where('id', '=', tiddlerId).execute();
     });
-    if (!wiki) {
-      throw new NotFoundException(`Wiki not found: ${wikiId}`);
-    }
-    const tiddler = await this.tiddlerRepository.findOne({
-      where: { wiki: { id: wikiId }, title },
-    });
-    if (!tiddler) {
-      throw new NotFoundException(`Tiddler not found: ${title}`);
-    }
-    await this.tiddlerRepository.remove(tiddler);
   }
 
   async queryByVector(
     wikiId: string,
     embeddingVec: number[],
     limit: number = 5,
-  ): Promise<Pick<Tiddler, 'title' | 'text'>[]> {
-    return (
-      this.tiddlerRepository
-        .createQueryBuilder('tiddler')
-        .select(['tiddler.title', 'tiddler.text'])
-        .innerJoin('tiddler.wiki', 'wiki')
-        .where('wiki.id = :wikiId', { wikiId })
-        .orderBy('tiddler.embedding <-> :embedding::vector')
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        .setParameters({ embedding: toSql(embeddingVec) })
+  ): Promise<TiddlerResponseDto[] | null> {
+    return await this.db.transaction().execute(async (trx) => {
+      const wiki = await trx
+        .selectFrom('wiki')
+        .select(['uid'])
+        .where('id', '=', wikiId)
+        .executeTakeFirst();
+      if (!wiki) {
+        return null;
+      }
+
+      const tiddlers = await this.db
+        .selectFrom('tiddler')
+        .select(['id', 'title', 'text', 'meta', 'tags', 'type'])
+        .orderBy(l2Distance('wiki.embedding', embeddingVec))
         .limit(limit)
-        .getMany()
-    );
+        .execute();
+
+      return tiddlers.map((tiddler) => ({
+        ...tiddler,
+        wikiId,
+      }));
+    });
   }
 }

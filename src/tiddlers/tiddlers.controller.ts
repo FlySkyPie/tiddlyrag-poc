@@ -6,7 +6,9 @@ import {
   Param,
   Body,
   Patch,
+  NotFoundException,
 } from '@nestjs/common';
+import { ApiOperation } from '@nestjs/swagger';
 
 import { TiddlersService } from './tiddlers.service';
 import { CreateTiddlerDto } from './dto/create-tiddler';
@@ -18,14 +20,19 @@ import { TiddlerListResponseDto } from './dto/tiddler-list-response.dto';
 export class TiddlersController {
   constructor(private readonly tiddlersService: TiddlersService) {}
 
-  /**
-   * Only this endpoint is useful for POC, rest just for RESTful compatible.
-   */
   @Get()
   async getTiddlers(
     @Param('wiki') wikiId: string,
   ): Promise<TiddlerListResponseDto> {
-    throw new Error('Not implement yet');
+    const tiddlers = await this.tiddlersService.findAll(wikiId);
+    if (!tiddlers) {
+      throw new NotFoundException(`The Wiki is not found: ${wikiId}`);
+    }
+
+    return {
+      tiddlers,
+      total: tiddlers.length,
+    };
   }
 
   @Post()
@@ -33,7 +40,7 @@ export class TiddlersController {
     @Param('wiki') wikiId: string,
     @Body() createTiddlerDto: CreateTiddlerDto,
   ): Promise<TiddlerResponseDto> {
-    throw new Error('Not implement yet');
+    return this.tiddlersService.simpleCreate(wikiId, createTiddlerDto);
   }
 
   @Get(':tiddler_id')
@@ -41,7 +48,12 @@ export class TiddlersController {
     @Param('wiki') wikiId: string,
     @Param('tiddler_id') tiddlerId: number,
   ): Promise<TiddlerResponseDto> {
-    throw new Error('Not implement yet');
+    const tiddler = await this.tiddlersService.findOne(wikiId, tiddlerId);
+    if (!tiddler) {
+      throw new NotFoundException();
+    }
+
+    return tiddler;
   }
 
   @Patch(':tiddler_id')
@@ -54,10 +66,13 @@ export class TiddlersController {
   }
 
   @Delete(':tiddler_id')
+  @ApiOperation({
+    summary: 'Delete a Tiddler.',
+  })
   async deleteTiddler(
     @Param('wiki') wikiId: string,
     @Param('tiddler_id') tiddlerId: number,
   ): Promise<void> {
-    throw new Error('Not implement yet');
+    await this.tiddlersService.delete(wikiId, tiddlerId);
   }
 }
