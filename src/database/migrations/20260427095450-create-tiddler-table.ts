@@ -9,17 +9,10 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('text', 'text', (cb) => cb.notNull())
     .addColumn('tags', sql`text[]`, (cb) => cb.notNull())
     .addColumn('meta', 'jsonb', (cb) => cb.notNull())
-    .addColumn('embedding', sql`vector(1536)`)
+    .addColumn('embedding', sql`vector`)
     .addColumn('wikiUid', 'integer', (cb) =>
       cb.references('wiki.uid').onDelete('cascade'),
     )
-    .execute();
-
-  await db.schema
-    .createIndex('tiddler_embedding_idx')
-    .on('tiddler')
-    .using('hnsw')
-    .column('embedding')
     .execute();
 
   await db.schema
@@ -31,6 +24,5 @@ export async function up(db: Kysely<any>): Promise<void> {
 
 export async function down(db: Kysely<any>): Promise<void> {
   await db.schema.dropIndex('tiddler_wikiUid_idx').execute();
-  await db.schema.dropIndex('tiddler_embedding_idx').execute();
   await db.schema.dropTable('tiddler').execute();
 }
