@@ -1,22 +1,25 @@
-import { Kysely } from 'kysely';
+import { Kysely, sql } from 'kysely';
 
 export async function up(db: Kysely<any>): Promise<void> {
-  /**
-   * @todo Implement following DDL with kysely
-   */
-  // CREATE TABLE public.wiki (
-  // 	uid serial4 NOT NULL,
-  // 	id varchar(500) NOT NULL,
-  // 	title varchar(500) NOT NULL,
-  // 	subtitle varchar(500) NOT NULL,
-  // 	description text NOT NULL,
-  // 	embedding public.vector NOT NULL,
-  // 	CONSTRAINT "PK_25a44ba2e459bcafa465ca1a71c" PRIMARY KEY (uid),
-  // 	CONSTRAINT "UQ_c021a14e8072245b6d24f069ace" UNIQUE (id)
-  // );
-  // Migration code
+  await db.schema
+    .createTable('wiki')
+    .addColumn('uid', 'serial', (cb) => cb.primaryKey())
+    .addColumn('id', 'varchar(500)', (cb) => cb.notNull().unique())
+    .addColumn('title', 'varchar(500)', (cb) => cb.notNull())
+    .addColumn('subtitle', 'varchar(500)', (cb) => cb.notNull())
+    .addColumn('description', 'text', (cb) => cb.notNull())
+    .addColumn('embedding', sql`vector(1536)`)
+    .execute();
+
+  await db.schema
+    .createIndex('wiki_embedding_idx')
+    .on('wiki')
+    .using('hnsw')
+    .column('embedding')
+    .execute();
 }
 
 export async function down(db: Kysely<any>): Promise<void> {
-  // Migration code
+  await db.schema.dropIndex('wiki_embedding_idx').execute();
+  await db.schema.dropTable('wiki').execute();
 }

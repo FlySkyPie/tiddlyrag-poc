@@ -1,24 +1,36 @@
-import { Kysely } from 'kysely';
+import { Kysely, sql } from 'kysely';
 
 export async function up(db: Kysely<any>): Promise<void> {
-  /**
-   * @todo Implement following DDL with kysely
-   */
-  //     CREATE TABLE public.tiddler (
-  // 	id serial4 NOT NULL,
-  // 	title varchar(500) NOT NULL,
-  // 	"type" varchar(500) NULL,
-  // 	"text" text NOT NULL,
-  // 	tags _text NOT NULL,
-  // 	meta jsonb NOT NULL,
-  // 	embedding public.vector NOT NULL,
-  // 	"wikiUid" int4 NULL,
-  // 	CONSTRAINT "PK_a8d10660d8fd87190e548d6ded5" PRIMARY KEY (id),
-  // 	CONSTRAINT "FK_c7466a6f1b30e090d20c2eee89d" FOREIGN KEY ("wikiUid") REFERENCES public.wiki(uid)
-  // );
-  // Migration code
+  await db.schema
+    .createTable('tiddler')
+    .addColumn('id', 'serial', (cb) => cb.primaryKey())
+    .addColumn('title', 'varchar(500)', (cb) => cb.notNull())
+    .addColumn('type', 'varchar(500)')
+    .addColumn('text', 'text', (cb) => cb.notNull())
+    .addColumn('tags', sql`text[]`, (cb) => cb.notNull())
+    .addColumn('meta', 'jsonb', (cb) => cb.notNull())
+    .addColumn('embedding', sql`vector(1536)`)
+    .addColumn('wikiUid', 'integer', (cb) =>
+      cb.references('wiki.uid').onDelete('cascade'),
+    )
+    .execute();
+
+  await db.schema
+    .createIndex('tiddler_embedding_idx')
+    .on('tiddler')
+    .using('hnsw')
+    .column('embedding')
+    .execute();
+
+  await db.schema
+    .createIndex('tiddler_wikiUid_idx')
+    .on('tiddler')
+    .column('wikiUid')
+    .execute();
 }
 
 export async function down(db: Kysely<any>): Promise<void> {
-  // Migration code
+  await db.schema.dropIndex('tiddler_wikiUid_idx').execute();
+  await db.schema.dropIndex('tiddler_embedding_idx').execute();
+  await db.schema.dropTable('tiddler').execute();
 }
