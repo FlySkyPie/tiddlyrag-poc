@@ -4,7 +4,7 @@ import { KyselyModule } from 'nestjs-kysely';
 import { PostgresDialect } from 'kysely';
 import { Pool } from 'pg';
 
-import { databaseProviders } from './database.providers';
+import { KyselyMigrationProvider } from './kysely.migration-provider';
 
 @Module({
   imports: [
@@ -20,10 +20,16 @@ import { databaseProviders } from './database.providers';
             password: configService.get<string>('database.password'),
           }),
         }),
+        migrations: {
+          migrationsRun: true,
+          migratorProps: {
+            provider: new KyselyMigrationProvider(),
+          },
+        },
       }),
     }),
   ],
-  providers: [...databaseProviders],
-  exports: [...databaseProviders, KyselyModule],
+  providers: [],
+  exports: [KyselyModule],
 })
 export class DatabaseModule {}
