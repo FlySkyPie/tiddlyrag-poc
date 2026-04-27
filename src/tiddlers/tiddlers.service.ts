@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Kysely } from 'kysely';
-import { InjectKysely } from 'nestjs-kysely';
+import { KyselyService } from '@anchan828/nest-kysely';
 
 import { Database } from '../database/interfaces/database';
 
@@ -9,10 +8,7 @@ import { TiddlerResponseDto } from './dto/tiddler-response.dto';
 
 @Injectable()
 export class TiddlersService {
-  constructor(
-    @InjectKysely()
-    private readonly db: Kysely<Database>,
-  ) {}
+  constructor(private readonly kysely: KyselyService<Database>) {}
 
   /**
    * When a content of Wiki (Tidder) been update, embedding and abstract should also been update,
@@ -22,7 +18,7 @@ export class TiddlersService {
     wikiId: string,
     createTiddlerDto: CreateTiddlerDto,
   ): Promise<TiddlerResponseDto> {
-    const wiki = await this.db
+    const wiki = await this.kysely.db
       .selectFrom('wiki')
       .select('uid')
       .where('id', '=', wikiId)
@@ -33,7 +29,7 @@ export class TiddlersService {
     }
 
     const { title, text, meta, tags, type } = createTiddlerDto;
-    const tiddler = await this.db
+    const tiddler = await this.kysely.db
       .insertInto('tiddler')
       .values([
         {
@@ -60,7 +56,7 @@ export class TiddlersService {
   }
 
   async findAll(wikiId: string): Promise<TiddlerResponseDto[] | null> {
-    return await this.db.transaction().execute(async (trx) => {
+    return await this.kysely.db.transaction().execute(async (trx) => {
       const wiki = await trx
         .selectFrom('wiki')
         .select(['uid'])
@@ -87,7 +83,7 @@ export class TiddlersService {
     wikiId: string,
     tiddlerId: number,
   ): Promise<TiddlerResponseDto | null> {
-    return await this.db.transaction().execute(async (trx) => {
+    return await this.kysely.db.transaction().execute(async (trx) => {
       const wiki = await trx
         .selectFrom('wiki')
         .select(['uid'])
@@ -115,7 +111,7 @@ export class TiddlersService {
   }
 
   async delete(wikiId: string, tiddlerId: number): Promise<void> {
-    await this.db.transaction().execute(async (trx) => {
+    await this.kysely.db.transaction().execute(async (trx) => {
       const wiki = await trx
         .selectFrom('wiki')
         .select(['uid'])

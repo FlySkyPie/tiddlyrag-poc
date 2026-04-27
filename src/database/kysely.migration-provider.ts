@@ -1,7 +1,9 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import { Injectable } from '@nestjs/common';
 import { FileMigrationProvider, Migration, MigrationProvider } from 'kysely';
 
+@Injectable()
 export class KyselyMigrationProvider implements MigrationProvider {
   #fileProvider: FileMigrationProvider;
 
@@ -9,7 +11,6 @@ export class KyselyMigrationProvider implements MigrationProvider {
     this.#fileProvider = new FileMigrationProvider({
       fs,
       path,
-      // This needs to be an absolute path.
       migrationFolder: path.resolve(path.join(__dirname, './migrations')),
     });
   }

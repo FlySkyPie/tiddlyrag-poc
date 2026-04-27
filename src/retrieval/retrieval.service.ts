@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { l2Distance } from 'pgvector/kysely';
-import { Kysely } from 'kysely';
-import { InjectKysely } from 'nestjs-kysely';
+import { KyselyService } from '@anchan828/nest-kysely';
 
 import { EmbeddingService } from '../embedding/embedding.service';
 import { Database } from '../database/interfaces/database';
@@ -13,20 +12,19 @@ import { ResolveWikiResponseItemDto } from './dto/resolve-wiki-response-item.dto
 export class RetrievalService {
   constructor(
     private readonly embeddingService: EmbeddingService,
-    @InjectKysely()
-    private readonly db: Kysely<Database>,
+    private readonly kysely: KyselyService<Database>,
   ) {}
 
   async resolveWiki(query: string): Promise<ResolveWikiResponseItemDto[]> {
     const embeddingVec = await this.embeddingService.embedding(query);
 
-    const subquery = this.db
+    const subquery = this.kysely.db
       .selectFrom('wiki')
       .select(['id', 'uid', 'title', 'subtitle', 'description'])
       .orderBy(l2Distance('wiki.embedding', embeddingVec))
       .limit(5);
 
-    const result = await this.db
+    const result = await this.kysely.db
       .selectFrom(subquery.as('w'))
       .leftJoin('tiddler', 'tiddler.wikiUid', 'w.uid')
       .select(({ fn }) => [
@@ -52,7 +50,7 @@ export class RetrievalService {
     query: string,
   ): Promise<QueryTiddlersResponseItemDto[]> {
     const embeddingVec = await this.embeddingService.embedding(query);
-    const tiddlers = await this.db.transaction().execute(async (trx) => {
+    const tiddlers = await this.kysely.db.transaction().execute(async (trx) => {
       const wiki = await trx
         .selectFrom('wiki')
         .select(['uid'])
@@ -62,7 +60,7 @@ export class RetrievalService {
         return null;
       }
 
-      const tiddlers = await this.db
+      const tiddlers = await this.kysely.db
         .selectFrom('tiddler')
         .select(['title', 'text'])
         .where('wikiUid', '=', wiki.uid)

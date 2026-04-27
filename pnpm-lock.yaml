@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@anchan828/nest-kysely':
+        specifier: ^0.9.26
+        version: 0.9.26(kysely@0.28.16)
       '@modelcontextprotocol/sdk':
         specifier: ^1.29.0
         version: 1.29.0(zod@4.3.6)
@@ -44,9 +47,6 @@ importers:
       kysely:
         specifier: ^0.28.16
         version: 0.28.16
-      nestjs-kysely:
-        specifier: ^3.1.2
-        version: 3.1.2(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)(kysely@0.28.16)(reflect-metadata@0.2.2)
       openai:
         specifier: ^6.34.0
         version: 6.34.0(zod@4.3.6)
@@ -146,6 +146,18 @@ importers:
         version: 8.58.2(eslint@9.39.4)(typescript@5.9.3)
 
 packages:
+
+  '@anchan828/kysely-migration@0.9.26':
+    resolution: {integrity: sha512-3lfFMtvMi89h2ANGSkEJ/mdWPOxqhbyU27wXMwrh91DoTXZuo/n8waT8yyRj5D8gWXJ6UQ/RG9zxrV33UBP++Q==}
+    hasBin: true
+    peerDependencies:
+      kysely: ^0.27.4 || ^0.28.0
+
+  '@anchan828/nest-kysely@0.9.26':
+    resolution: {integrity: sha512-5cejfUFo2vF4Yu7NKlV89ZBh9QGIMET/Co4eHIh+HsAG+RKoi+Ky1ovQgaVLffDAvbDEXef6TG258rpTFYovZA==}
+    hasBin: true
+    peerDependencies:
+      kysely: ^0.27.4 || ^0.28.0
 
   '@angular-devkit/core@19.2.24':
     resolution: {integrity: sha512-Kd49warf6U/EyWe5BszF/eebN3zQ3bk7tgfEljAw8q/rX95UUtriJubWvp6pgzHfzBA4jwq8f+QiNZB8eBEXPA==}
@@ -2548,14 +2560,6 @@ packages:
   neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
 
-  nestjs-kysely@3.1.2:
-    resolution: {integrity: sha512-m7gK37oza6yyRmOs6VWQ6Ri5wgqUnmWpMUByd1V8WLZcYCeVPgXGxzw3ABRWUIX/1kr+nZUhaAZRgAIhk2JXoQ==}
-    peerDependencies:
-      '@nestjs/common': ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0
-      '@nestjs/core': ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0
-      kysely: 0.x
-      reflect-metadata: ^0.1.13 || ^0.2.2
-
   node-abort-controller@3.1.1:
     resolution: {integrity: sha512-AGK2yQKIjRuqnc6VkX2Xj5d+QW8xZ87pa1UK6yA6ouUyuxfHuMP6umE5QK7UmTeOAymo+Zx1Fxiuw9rVx8taHQ==}
 
@@ -3392,6 +3396,15 @@ packages:
     resolution: {integrity: sha512-41dFXEEXuJpNecuUQq6JlbybmnHaqqpGlbH1yxnA5V9MMP4SbohSVZsJIwz+zdjQXSSlR1Vc34EgH1zxyTDvhg==}
 
 snapshots:
+
+  '@anchan828/kysely-migration@0.9.26(kysely@0.28.16)':
+    dependencies:
+      kysely: 0.28.16
+
+  '@anchan828/nest-kysely@0.9.26(kysely@0.28.16)':
+    dependencies:
+      '@anchan828/kysely-migration': 0.9.26(kysely@0.28.16)
+      kysely: 0.28.16
 
   '@angular-devkit/core@19.2.24(chokidar@4.0.3)':
     dependencies:
@@ -6146,13 +6159,6 @@ snapshots:
   negotiator@1.0.0: {}
 
   neo-async@2.6.2: {}
-
-  nestjs-kysely@3.1.2(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)(kysely@0.28.16)(reflect-metadata@0.2.2):
-    dependencies:
-      '@nestjs/common': 11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@nestjs/core': 11.1.19(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.1.19)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      kysely: 0.28.16
-      reflect-metadata: 0.2.2
 
   node-abort-controller@3.1.1: {}
 

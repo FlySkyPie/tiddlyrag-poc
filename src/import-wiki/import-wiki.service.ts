@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { InjectKysely } from 'nestjs-kysely';
-import { Kysely, sql } from 'kysely';
+import { sql } from 'kysely';
 import { toSql } from 'pgvector/kysely';
+import { KyselyService } from '@anchan828/nest-kysely';
 
 import type { Database } from '../database/interfaces/database';
 import type { Wiki } from '../database/interfaces/wiki';
@@ -12,8 +12,7 @@ import { EmbeddingService } from '../embedding/embedding.service';
 @Injectable()
 export class ImportWikiService {
   constructor(
-    @InjectKysely()
-    private readonly db: Kysely<Database>,
+    private readonly kysely: KyselyService<Database>,
     private readonly tiddlywikisService: TiddlywikisService,
     private readonly llmService: LlmService,
     private readonly embeddingService: EmbeddingService,
@@ -30,7 +29,7 @@ export class ImportWikiService {
     const { title, subtitle, tiddlers } =
       this.tiddlywikisService.resolveTiddlyWiki(tiddlywikiHtml);
 
-    const createdWiki = await this.db
+    const createdWiki = await this.kysely.db
       .insertInto('wiki')
       .values([
         {
@@ -52,7 +51,7 @@ export class ImportWikiService {
       const { title, text, type, tags, ...rest } = tiddlers[index];
       const embedding = await this.embeddingService.embedding(text ?? '');
 
-      await this.db
+      await this.kysely.db
         .insertInto('tiddler')
         .values([
           {
@@ -75,7 +74,7 @@ export class ImportWikiService {
     );
     const embedding = await this.embeddingService.embedding(description);
 
-    const result = await this.db
+    const result = await this.kysely.db
       .updateTable('wiki')
       .set({
         description,

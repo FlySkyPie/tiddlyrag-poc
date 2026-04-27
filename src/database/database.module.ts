@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { KyselyModule } from 'nestjs-kysely';
+import { KyselyModule } from '@anchan828/nest-kysely';
 import { PostgresDialect } from 'kysely';
 import { Pool } from 'pg';
 
@@ -8,7 +8,7 @@ import { KyselyMigrationProvider } from './kysely.migration-provider';
 
 @Module({
   imports: [
-    KyselyModule.forRootAsync({
+    KyselyModule.registerAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         dialect: new PostgresDialect({

@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { InjectKysely } from 'nestjs-kysely';
-import { Kysely } from 'kysely';
+import { KyselyService } from '@anchan828/nest-kysely';
 
 import type { Database } from '../database/interfaces/database';
 import { TiddlywikisService } from '../tiddywiki/tiddywiki.service';
@@ -10,13 +9,12 @@ import { WikiSummaryDto } from './dto/wiki-summary.dto';
 @Injectable()
 export class WikisService {
   constructor(
-    @InjectKysely()
-    private readonly db: Kysely<Database>,
+    private readonly kysely: KyselyService<Database>,
     private readonly tiddlywikisService: TiddlywikisService,
   ) {}
 
   async findOne(wikiId: string): Promise<WikiSummaryDto> {
-    const results = await this.db
+    const results = await this.kysely.db
       .selectFrom('wiki')
       .leftJoin('tiddler', 'tiddler.wikiUid', 'wiki.uid')
       .select(({ fn }) => [
@@ -41,7 +39,7 @@ export class WikisService {
   }
 
   async findAll(): Promise<WikiSummaryDto[]> {
-    const results = await this.db
+    const results = await this.kysely.db
       .selectFrom('wiki')
       .leftJoin('tiddler', 'tiddler.wikiUid', 'wiki.uid')
       .select(({ fn }) => [
@@ -61,7 +59,7 @@ export class WikisService {
   }
 
   async remove(wikiId: string): Promise<void> {
-    await this.db.transaction().execute(async (trx) => {
+    await this.kysely.db.transaction().execute(async (trx) => {
       const wiki = await trx
         .selectFrom('wiki')
         .select(['uid'])
@@ -78,7 +76,7 @@ export class WikisService {
   }
 
   async genTiddlyWiki(wikiId: string): Promise<string> {
-    const wiki = await this.db
+    const wiki = await this.kysely.db
       .selectFrom('wiki')
       .select(['uid', 'title', 'subtitle'])
       .where('id', '=', wikiId)
@@ -97,7 +95,7 @@ export class WikisService {
       new $tw.Tiddler({ text: wiki.subtitle }, { title: '$:/SiteSubtitle' }),
     );
 
-    const tiddlers = await this.db
+    const tiddlers = await this.kysely.db
       .selectFrom('tiddler')
       .select(['text', 'text', 'tags', 'meta', 'type', 'title'])
       .where('wikiUid', '=', wiki.uid)
