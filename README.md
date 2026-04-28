@@ -41,6 +41,50 @@ This POC providing a HTTP API used to upload a TiddlyWiki into database, only Ti
 Also providing a simple MCP interface allowed you integrate with other LLM tools, the interface design is inspired by Context7.
 
 
+## Usage
+
+```yaml
+services:
+  tiddlyrag:
+    image: ghcr.io/flyskypie/tiddlyrag-poc:type-a-0.1.0
+    ports:
+      - 8089:3000
+    environment:
+      - DATABASE_HOST=pgvector
+      - DATABASE_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+
+      - EMBEDDING_BASE_PATH=https://openrouter.ai/api/v1/embeddings
+      - EMBEDDING_MODEL=qwen/qwen3-embedding-4b
+      - EMBEDDING_API_KEY=
+
+      - COMMON_LLM_MODEL=qwen/qwen3.5-27b
+      - COMMON_LLM_BASE_PATH=https://openrouter.ai/api/v1
+      - COMMON_LLM_API_KEY=
+      
+      - TIDDLYWIKI_TEMPLATE_PATH=/tiddlywiki-template
+    volumes:
+      - ./tiddlywiki-template:/tiddlywiki-template
+```
+
+and open http://localhost:8089/docs
+
+### Tiddlywiki Template
+
+You can setup plugins or tidders as base TiddlyWiki:
+
+```
+└── tiddlywiki-template
+    ├── plugins
+    ├── public
+    ├── tiddlers
+    └── tiddlywiki.info
+```
+
+This used for the endpoint `GET /wikis/{wiki}`.
+
 ## More Information
 
 If you interesting about the idea, here are related materials, some of them are blog posts I wrote before.
