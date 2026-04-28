@@ -1,0 +1,8 @@
+services:
+  tiddlyrag:
+    image: ghcr.io/flyskypie/tiddlyrag-poc:type-a-0.10
+    build:
+      context: ../..
+      dockerfile: dev/build/Dockerfile
+    ports:
+      - 8080:3000
