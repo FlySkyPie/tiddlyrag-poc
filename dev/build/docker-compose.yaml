@@ -1,6 +1,6 @@
 services:
   tiddlyrag:
-    image: ghcr.io/flyskypie/tiddlyrag-poc:type-a-0.10
+    image: ghcr.io/flyskypie/tiddlyrag-poc:type-a-0.1.0
     build:
       context: ../..
       dockerfile: dev/build/Dockerfile

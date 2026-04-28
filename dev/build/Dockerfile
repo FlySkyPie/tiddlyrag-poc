@@ -27,4 +27,4 @@ COPY --from=prod-deps /tiddlyrag/node_modules /tiddlyrag/node_modules
 COPY --from=build /tiddlyrag/dist /tiddlyrag/dist
 
 EXPOSE 3000
-CMD [ "pnpm", "start" ]
+CMD [ "pnpm", "start:prod" ]

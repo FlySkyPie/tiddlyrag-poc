@@ -1,4 +1,3 @@
-import 'multer';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class WikiSummaryDto {
