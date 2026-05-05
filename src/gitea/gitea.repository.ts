@@ -68,7 +68,7 @@ export class GiteaRepository {
 
   async readFilePaths(
     repoName: string,
-    glob: string = '**/*',
+    glob: string[] = ['**/*'],
   ): Promise<string[]> {
     const isMatch = picomatch(glob);
     const files: string[] = [];
