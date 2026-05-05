@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiBody, ApiOperation } from '@nestjs/swagger';
 
 import { ImportRepoRequestDto } from './dto/import-repo-request.dto';
@@ -18,5 +18,11 @@ export class GiteaController {
   async import(@Body() importRepoRequestDto: ImportRepoRequestDto) {
     const { repoUrl, repoName } = importRepoRequestDto;
     return this.giteaRepository.migrate(repoUrl, repoName);
+  }
+
+  @Get('test')
+  async test() {
+    // return this.giteaRepository.readFile('AdalFlow', 'LICENSE.md');
+    return this.giteaRepository.readFilePaths('AdalFlow');
   }
 }
