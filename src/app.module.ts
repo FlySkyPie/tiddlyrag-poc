@@ -3,13 +3,16 @@ import { ConfigModule } from '@nestjs/config';
 
 import giteaConfig from './config/gitea';
 import openaiConfig from './config/openai';
+import databaseConfig from './config/database';
 import { GiteaModule } from './gitea/gitea.module';
+import { DatabaseModule } from './database/database.module';
 
 @Module({
   imports: [
     GiteaModule,
+    DatabaseModule,
     ConfigModule.forRoot({
-      load: [giteaConfig, openaiConfig],
+      load: [giteaConfig, openaiConfig, databaseConfig],
       isGlobal: true,
     }),
   ],
