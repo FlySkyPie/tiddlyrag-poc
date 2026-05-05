@@ -18,6 +18,22 @@ services:
     ports:
       - "8080:3000"
       - "2222:22" 
+  pgvector:
+    image: docker.io/pgvector/pgvector:0.8.2-pg18-trixie
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - pgvector:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
 volumes:
   gitea-data:
+  pgvector:
