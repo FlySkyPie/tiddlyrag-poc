@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiBody, ApiOperation } from '@nestjs/swagger';
 
 import { GiteaRepository } from '../gitea/gitea.repository';
+import { LlmService } from '../llm/llm.service';
 
 import { ImportRepoRequestDto } from './dto/import-repo-request.dto';
 import { ImportRepoService } from './import-repo.service';
@@ -11,6 +12,7 @@ export class ImportRepoController {
   constructor(
     private readonly giteaRepository: GiteaRepository,
     private readonly importRepoService: ImportRepoService,
+    private readonly llmService: LlmService,
   ) {}
 
   @Post('import')
@@ -28,6 +30,7 @@ export class ImportRepoController {
   @Get('test')
   async test() {
     // return this.giteaRepository.readFile('AdalFlow', 'LICENSE.md');
-    return this.giteaRepository.readFilePaths('AdalFlow');
+    // return this.giteaRepository.readFilePaths('AdalFlow');
+    return this.llmService.createWikiStructure();
   }
 }
