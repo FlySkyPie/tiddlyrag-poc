@@ -23,6 +23,9 @@ export class GiteaRepository {
     this.baseURL = this.configService.get<string>('gitea.api_base')!;
   }
 
+  /**
+   * Download a git repo from remote and stored into Gitea instance.
+   */
   async migrate(repoUrl: string, repoName: string): Promise<unknown> {
     const url = new URL('/api/v1/repos/migrate', this.baseURL);
 
@@ -44,6 +47,9 @@ export class GiteaRepository {
     return response.data;
   }
 
+  /**
+   * Read contents from stored repo.
+   */
   async readPath(
     repoName: string,
     filepath = '.',
@@ -66,6 +72,9 @@ export class GiteaRepository {
     return response.data;
   }
 
+  /**
+   * Read file paths from stored repo.
+   */
   async readFilePaths(
     repoName: string,
     glob: string[] = ['**/*'],
@@ -93,6 +102,9 @@ export class GiteaRepository {
     return files;
   }
 
+  /**
+   * Read conent of a file from stored repo.
+   */
   async readFile(repoName: string, filepath: string): Promise<string> {
     const url = new URL(
       `/api/v1/repos/${this.user}/${repoName}/raw/${filepath}`,

@@ -1,12 +1,17 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiBody, ApiOperation } from '@nestjs/swagger';
 
-import { ImportRepoRequestDto } from './dto/import-repo-request.dto';
-import { GiteaRepository } from './gitea.repository';
+import { GiteaRepository } from '../gitea/gitea.repository';
 
-@Controller('gitea')
-export class GiteaController {
-  constructor(private readonly giteaRepository: GiteaRepository) {}
+import { ImportRepoRequestDto } from './dto/import-repo-request.dto';
+import { ImportRepoService } from './import-repo.service';
+
+@Controller('import-repo')
+export class ImportRepoController {
+  constructor(
+    private readonly giteaRepository: GiteaRepository,
+    private readonly importRepoService: ImportRepoService,
+  ) {}
 
   @Post('import')
   @ApiOperation({
@@ -17,7 +22,7 @@ export class GiteaController {
   })
   async import(@Body() importRepoRequestDto: ImportRepoRequestDto) {
     const { repoUrl, repoName } = importRepoRequestDto;
-    return this.giteaRepository.migrate(repoUrl, repoName);
+    return this.importRepoService.saimpleImport(repoUrl, repoName);
   }
 
   @Get('test')
