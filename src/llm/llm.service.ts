@@ -10,6 +10,8 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import nunjucks from 'nunjucks';
 
+import type { CreateWikiStructureParamDto } from './interface/create-wiki-structure-param.dto';
+
 @Injectable()
 export class LlmService {
   private readonly environment: Environment;
@@ -20,15 +22,26 @@ export class LlmService {
     this.environment = nunjucks.configure(resolve(__dirname, './prompts'));
   }
 
-  public async createWikiStructure(): Promise<string> {
+  public async createWikiStructure(
+    param: CreateWikiStructureParamDto,
+  ): Promise<string> {
+    const {
+      files,
+      isComprehensiveView,
+      languageName,
+      readme,
+      repoName,
+      repoType,
+      repoUrl,
+    } = param;
     const result = this.environment.render('stage-1.md', {
-      repo_type: 'github',
-      repo_url: 'https://github.com/FlySkyPie/ariadne-gis',
-      repo_name: 'ariadne-gis',
-      language_name: 'Traditional Chinese (繁體中文)',
-      files: [],
-      readme: 'THIS IS README',
-      is_comprehensive_view: false,
+      repo_type: repoType,
+      repo_url: repoUrl,
+      repo_name: repoName,
+      language_name: languageName,
+      files,
+      readme,
+      is_comprehensive_view: isComprehensiveView,
     });
 
     return this.requestLLM(result);
@@ -46,6 +59,22 @@ export class LlmService {
     });
 
     return this.requestLLM(result);
+  }
+
+  public renderWikiGenerator(
+    repoName: string,
+    readme: string,
+    filePaths: string[],
+  ): string {
+    return this.environment.render('segments/wiki_structure_generator.md', {
+      repo_type: repoName,
+      repo_url: 'https://github.com/FlySkyPie/ariadne-gis',
+      repo_name: 'ariadne-gis',
+      language_name: 'Traditional Chinese (繁體中文)',
+      files: filePaths.map((path) => ({ path })),
+      readme,
+      is_comprehensive_view: false,
+    });
   }
 
   private async requestLLM(content: string): Promise<string> {
