@@ -7,10 +7,11 @@ import { LlmModule } from '../llm/llm.module';
 
 import { ImportRepoController } from './import-repo.controller';
 import { ImportRepoService } from './import-repo.service';
+import { VectorRepository } from './vector.repository';
 
 @Module({
   imports: [GiteaModule, DatabaseModule, EmbeddingModule, LlmModule],
-  providers: [ImportRepoService],
+  providers: [ImportRepoService, VectorRepository],
   controllers: [ImportRepoController],
 })
 export class ImportRepoModule {}

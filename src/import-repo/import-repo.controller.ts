@@ -24,13 +24,14 @@ export class ImportRepoController {
   })
   async import(@Body() importRepoRequestDto: ImportRepoRequestDto) {
     const { repoUrl, repoName } = importRepoRequestDto;
-    return this.importRepoService.saimpleImport(repoUrl, repoName);
+    return this.importRepoService.simpleImport(repoUrl, repoName);
   }
 
   @Get('test')
   async test() {
     // return this.giteaRepository.readFile('AdalFlow', 'LICENSE.md');
     // return this.giteaRepository.readFilePaths('AdalFlow');
-    return this.llmService.createWikiStructure();
+    // return this.llmService.createWikiStructure();
+    return this.importRepoService.simpleCreateWiki('ariadne-gis');
   }
 }
