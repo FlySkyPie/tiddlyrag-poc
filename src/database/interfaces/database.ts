@@ -3,5 +3,5 @@ import { RepoTable } from './repo';
 
 export interface Database {
   repo: RepoTable;
-  repoContent: RepoContentTable;
+  'repo-content': RepoContentTable;
 }
