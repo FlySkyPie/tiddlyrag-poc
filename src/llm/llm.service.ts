@@ -23,7 +23,9 @@ export class LlmService {
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) {
-    this.environment = nunjucks.configure(resolve(__dirname, './prompts'));
+    this.environment = nunjucks.configure(resolve(__dirname, './prompts'), {
+      autoescape: false,
+    });
   }
 
   public async createWikiStructure(
