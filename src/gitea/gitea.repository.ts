@@ -78,8 +78,9 @@ export class GiteaRepository {
   async readFilePaths(
     repoName: string,
     glob: string[] = ['**/*'],
+    ignore?: string[],
   ): Promise<string[]> {
-    const isMatch = picomatch(glob);
+    const isMatch = picomatch(glob, { ignore });
     const files: string[] = [];
     const pendingPaths: string[] = ['.'];
     while (pendingPaths.length) {
@@ -115,6 +116,16 @@ export class GiteaRepository {
       headers: {
         Authorization: `Basic ${this.credentials}`,
       },
+      /**
+       * Prevent JSON response been parsed
+       * @link https://github.com/axios/axios/issues/907#issuecomment-373988087
+       */
+      transformResponse: [
+        (data: any) => {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+          return data;
+        },
+      ],
     });
 
     return response.data;
