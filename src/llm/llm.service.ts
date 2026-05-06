@@ -12,6 +12,8 @@ import nunjucks from 'nunjucks';
 import { XMLParser } from 'fast-xml-parser';
 
 import type { CreateWikiStructureParamDto } from './interface/create-wiki-structure-param.dto';
+import type { WikiStructure } from './interface/wiki-structure.dto';
+import type { CreateWikiArticleParamDto } from './interface/create-wiki-article-param.dto';
 import { zWikiStructure } from './schema/z-wiki-structure';
 
 @Injectable()
@@ -26,7 +28,7 @@ export class LlmService {
 
   public async createWikiStructure(
     param: CreateWikiStructureParamDto,
-  ): Promise<any> {
+  ): Promise<WikiStructure> {
     const {
       files,
       isComprehensiveView,
@@ -60,19 +62,30 @@ export class LlmService {
         return false;
       },
     });
-    const jObj = zWikiStructure.parse(parser.parse(xmlStr));
+    const jObj: WikiStructure = zWikiStructure.parse(parser.parse(xmlStr));
     return jObj;
   }
 
-  public async createWikiArticle(): Promise<string> {
+  public async createWikiArticle(
+    param: CreateWikiArticleParamDto,
+  ): Promise<string> {
+    const {
+      fileUrls,
+      files,
+      languageName,
+      repoName,
+      repoType,
+      repoUrl,
+      title,
+    } = param;
     const result = this.environment.render('stage-2.md', {
-      repo_type: 'github',
-      repo_url: 'https://github.com/FlySkyPie/ariadne-gis',
-      repo_name: 'ariadne-gis',
-      language_name: 'Traditional Chinese (繁體中文)',
-      files: [],
-      file_paths: [],
-      title: '專案介紹',
+      repo_type: repoType,
+      repo_url: repoUrl,
+      repo_name: repoName,
+      language_name: languageName,
+      files,
+      file_paths: fileUrls,
+      title,
     });
 
     return this.requestLLM(result);

@@ -4,6 +4,7 @@ import { KyselyService } from '@anchan828/nest-kysely';
 import { toSql } from 'pgvector/kysely';
 import { sql } from 'kysely';
 
+import type { FileContentDto } from '../llm/interface/file-content.dto';
 import { GiteaRepository } from '../gitea/gitea.repository';
 import { EmbeddingService } from '../embedding/embedding.service';
 import { Database } from '../database/interfaces/database';
@@ -75,6 +76,13 @@ export class ImportRepoService {
    * Not a production ready implementation but providing basic interface to import Git Repo.
    */
   async simpleCreateWiki(repoName: string) {
+    /**
+     * Dummy data for now.
+     */
+    const languageName = 'Traditional Chinese (繁體中文)';
+    const repoType = 'github';
+    const repoUrl = 'https://github.com/FlySkyPie/ariadne-gis';
+
     const totalFiles = await this.giteaRepository.readFilePaths(repoName);
     const readme = await this.giteaRepository.readFile(repoName, 'README.md');
     const input = this.llmService.renderWikiGenerator(
@@ -83,16 +91,62 @@ export class ImportRepoService {
       totalFiles,
     );
     const files = await this.vectorRepository.queryFiles(repoName, input);
-    const result = this.llmService.createWikiStructure({
+    const {
+      wiki_structure: {
+        articles: { article: articles },
+        title,
+        description,
+      },
+    } = await this.llmService.createWikiStructure({
       files,
       isComprehensiveView: false,
-      languageName: 'Traditional Chinese (繁體中文)',
+      languageName,
       readme,
       repoName,
-      repoType: 'github',
-      repoUrl: 'https://github.com/FlySkyPie/ariadne-gis',
+      repoType,
+      repoUrl,
     });
 
-    return result;
+    const articleContents: string[] = [];
+
+    for (let index = 0; index < articles.length; index++) {
+      const {
+        title,
+        relevant_files: { file_path: filePaths },
+      } = articles[index];
+
+      /**
+       * The files should query from vector database, but let's do this as mock data for now.
+       */
+      const articleFiles: FileContentDto[] = [];
+      for (let j = 0; j < filePaths.length; j++) {
+        const path = filePaths[j];
+        const content = await this.giteaRepository.readFile(repoName, path);
+        articleFiles.push({
+          path,
+          content,
+        });
+      }
+
+      const articleContent = await this.llmService.createWikiArticle({
+        files: articleFiles,
+        fileUrls: filePaths.map((path) => ({
+          path,
+          url: path,
+        })),
+        languageName,
+        repoName,
+        repoType,
+        repoUrl,
+        title,
+      });
+      articleContents.push(articleContent);
+    }
+
+    return {
+      title,
+      description,
+      articleContents,
+    };
   }
 }
