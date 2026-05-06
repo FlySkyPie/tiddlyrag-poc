@@ -9,8 +9,10 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import nunjucks from 'nunjucks';
+import { XMLParser } from 'fast-xml-parser';
 
 import type { CreateWikiStructureParamDto } from './interface/create-wiki-structure-param.dto';
+import { zWikiStructure } from './schema/z-wiki-structure';
 
 @Injectable()
 export class LlmService {
@@ -24,7 +26,7 @@ export class LlmService {
 
   public async createWikiStructure(
     param: CreateWikiStructureParamDto,
-  ): Promise<string> {
+  ): Promise<any> {
     const {
       files,
       isComprehensiveView,
@@ -44,7 +46,22 @@ export class LlmService {
       is_comprehensive_view: isComprehensiveView,
     });
 
-    return this.requestLLM(result);
+    const xmlStr = await this.requestLLM(result);
+
+    const alwaysArray = [
+      'wiki_structure.articles.article',
+      'wiki_structure.articles.article.relevant_files.file_path',
+      'wiki_structure.articles.article.related_articles.related',
+    ];
+    const parser = new XMLParser({
+      ignoreAttributes: false,
+      isArray: (_, jpath: any) => {
+        if (alwaysArray.indexOf(jpath) !== -1) return true;
+        return false;
+      },
+    });
+    const jObj = zWikiStructure.parse(parser.parse(xmlStr));
+    return jObj;
   }
 
   public async createWikiArticle(): Promise<string> {
