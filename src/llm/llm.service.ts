@@ -1,4 +1,3 @@
-import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 import type {
@@ -28,20 +27,28 @@ export class LlmService {
       repo_name: 'ariadne-gis',
       language_name: 'Traditional Chinese (繁體中文)',
       files: [],
-      owner: 'FlySkyPie',
-      repo: 'ariadne-gis',
       readme: 'THIS IS README',
       is_comprehensive_view: false,
     });
 
-    return result;
+    return this.requestLLM(result);
   }
 
-  private async retrievalFiles(content: string): Promise<string> {
-    const systemPrompts = await readFile(
-      resolve(__dirname, './prompts/summarizer.md'),
-      'utf8',
-    );
+  public async createWikiArticle(): Promise<string> {
+    const result = this.environment.render('stage-2.md', {
+      repo_type: 'github',
+      repo_url: 'https://github.com/FlySkyPie/ariadne-gis',
+      repo_name: 'ariadne-gis',
+      language_name: 'Traditional Chinese (繁體中文)',
+      files: [],
+      file_paths: [],
+      title: '專案介紹',
+    });
+
+    return this.requestLLM(result);
+  }
+
+  private async requestLLM(content: string): Promise<string> {
     const model = this.configService.get<string>('openai.common_llm.model')!;
     const baseURL = this.configService.get<string>(
       'openai.common_llm.api_base',
@@ -50,10 +57,6 @@ export class LlmService {
     const request: ChatCompletionCreateParamsBase = {
       model,
       messages: [
-        {
-          role: 'system',
-          content: systemPrompts,
-        },
         {
           role: 'user',
           content,
