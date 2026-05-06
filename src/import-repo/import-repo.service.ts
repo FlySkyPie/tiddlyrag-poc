@@ -36,24 +36,32 @@ export class ImportRepoService {
       throw new Error('Unexpected state');
     }
 
-    const filepaths = await this.giteaRepository.readFilePaths(repoName);
+    const filepaths = await this.giteaRepository.readFilePaths(
+      repoName,
+      undefined,
+      ['**/package-lock.json', '**/*.lock', '**/*.png', '**/*.ico'],
+    );
     for (let index = 0; index < filepaths.length; index++) {
       const path = filepaths[index];
-      const content = await this.giteaRepository.readFile(repoName, path);
-      const embedding = await this.embeddingService.embedding(content);
+      try {
+        const content = await this.giteaRepository.readFile(repoName, path);
+        const embedding = await this.embeddingService.embedding(content);
 
-      await this.kysely.db
-        .insertInto('repo-content')
-        .values([
-          {
-            repo_uid: createdRepo.uid,
-            content,
-            filename: basename(path),
-            path,
-            embedding: sql<number[]>`${toSql(embedding)}`,
-          },
-        ])
-        .executeTakeFirst();
+        await this.kysely.db
+          .insertInto('repo-content')
+          .values([
+            {
+              repo_uid: createdRepo.uid,
+              content,
+              filename: basename(path),
+              path,
+              embedding: sql<number[]>`${toSql(embedding)}`,
+            },
+          ])
+          .executeTakeFirst();
+      } catch (error) {
+        console.log(`File: ${path} is skip, due to error: ${error}`);
+      }
     }
   }
 }
