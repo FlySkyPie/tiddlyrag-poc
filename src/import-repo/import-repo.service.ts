@@ -43,7 +43,7 @@ export class ImportRepoService {
       const embedding = await this.embeddingService.embedding(content);
 
       await this.kysely.db
-        .insertInto('repoContent')
+        .insertInto('repo-content')
         .values([
           {
             repo_uid: createdRepo.uid,
