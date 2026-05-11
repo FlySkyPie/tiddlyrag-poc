@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { State, BehaviourTree, type NodeDetails } from "mistreevous";
 import { toast, ToastContainer } from 'react-toastify';
 
@@ -26,9 +26,14 @@ export type AppState = {
 }
 
 export const AppFC: React.FC = () => {
-	/**
-	 * @todo Add multiple useState to stored
-	 */
+	const [layoutId, setLayoutId] = useState<string | null>(null);
+	const [definition, setDefinition] = useState<string>("");
+	const [agent, setAgent] = useState<string>("class Agent {}");
+	const [agentExceptionMessage, setAgentExceptionMessage] = useState<string>("");
+	const [behaviourTree, setBehaviourTree] = useState<BehaviourTree | null>(null);
+	const [behaviourTreeExceptionMessage, setBehaviourTreeExceptionMessage] = useState<string>("");
+	const [behaviourTreePlayInterval, setBehaviourTreePlayInterval] = useState<NodeJS.Timer | null>(null);
+	const [canvasElements, setCanvasElements] = useState<CanvasElements>({ nodes: [], edges: [] });
 
 	const onPlayButtonPressed = useCallback(()=>{},[]);
 
