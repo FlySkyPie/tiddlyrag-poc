@@ -1,4 +1,4 @@
-import { Position } from './workflo'; 
+import type { Position } from './workflo'; 
 
 /**
  * The FailedConnector component props.

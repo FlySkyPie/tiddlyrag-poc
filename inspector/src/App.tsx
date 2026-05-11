@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { State, BehaviourTree, convertMDSLToJSON, validateDefinition, BehaviourTreeOptions, NodeDetails } from "mistreevous";
+import { State, BehaviourTree, convertMDSLToJSON, validateDefinition, type BehaviourTreeOptions, type NodeDetails } from "mistreevous";
 import { toast, ToastContainer } from 'react-toastify';
 
 import './App.css';
@@ -13,10 +13,10 @@ import IconButton from '@mui/material/IconButton';
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
 
-import { CanvasElements, MainPanel } from './MainPanel';
+import { type CanvasElements, MainPanel } from './MainPanel';
 import { AgentTab } from './AgentTab';
 import { DefinitionTab } from './DefinitionTab';
-import { Example, Examples } from './Examples';
+import { type Example, Examples } from './Examples';
 
 export enum SidebarTab { Definition = 0, Board = 1 };
 

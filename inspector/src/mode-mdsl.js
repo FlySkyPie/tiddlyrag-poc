@@ -1,4 +1,5 @@
-var ace = require('ace-builds/src-noconflict/ace');
+// var ace = require('ace-builds/src-noconflict/ace');
+import ace from 'ace-builds/src-noconflict/ace';
 
 ace.define('ace/mode/mdsl', function (require, exports, module) {
     var oop = require("ace/lib/oop");

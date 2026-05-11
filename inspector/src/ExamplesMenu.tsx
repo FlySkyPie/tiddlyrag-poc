@@ -9,7 +9,7 @@ import MenuList from '@mui/material/MenuList/MenuList';
 import Divider from '@mui/material/Divider/Divider';
 import Typography from '@mui/material/Typography/Typography';
 
-import { Example, ExampleCategory, Examples } from './Examples';
+import { type Example, type ExampleCategory, Examples } from './Examples';
 
 export type ExamplesMenuProps = {
     onExampleSelected(example: Example): void;

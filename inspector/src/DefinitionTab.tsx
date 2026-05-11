@@ -10,7 +10,7 @@ import { Chip, Divider } from "@mui/material";
 
 import { DefinitionType } from "./App";
 import { ExamplesMenu } from "./ExamplesMenu";
-import { Example } from "./Examples";
+import type { Example } from "./Examples";
 
 import './DefinitionTab.css';
 

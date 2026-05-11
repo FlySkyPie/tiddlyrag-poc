@@ -1,8 +1,7 @@
 import React from 'react';
 
-import { Node } from './Node';
 import { NodeContainer } from './NodeContainer';
-import { ConnectorType, NodeType, NodeWithChildren } from './workflo';
+import type { ConnectorType, NodeType, NodeWithChildren } from './workflo';
 
 import './WorkflowCanvas.css';
 

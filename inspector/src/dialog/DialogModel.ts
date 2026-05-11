@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 
 import { DialogComponent } from "./DialogComponent";
-import { DialogFieldType } from "./DialogTypes";
+import type { DialogFieldType } from "./DialogTypes";
 
 /**
  * A model representing a dialog.

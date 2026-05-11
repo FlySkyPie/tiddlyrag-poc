@@ -1,4 +1,4 @@
-import { NodeDetails, State } from 'mistreevous';
+import { type NodeDetails, State } from 'mistreevous';
 
 import actionIcon from './icons/action.png';
 import conditionIcon from './icons/condition.png'; 

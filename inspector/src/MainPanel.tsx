@@ -8,10 +8,10 @@ import Fab from "@mui/material/Fab/Fab";
 
 import { ActiveConnector } from "./workflo/ActiveConnector";
 import { SucceededConnector } from "./workflo/SucceededConnector";
-import { WorkflowCanvas, WorkflowCanvasInstance } from "./workflo/WorkflowCanvas";
+import { WorkflowCanvas, type WorkflowCanvasInstance } from "./workflo/WorkflowCanvas";
 import { DefaultNode } from "./workflo/DefaultNode";
 import { DefaultConnector } from "./workflo/DefaultConnector";
-import { NodeType, ConnectorType } from "./workflo/workflo";
+import type { NodeType, ConnectorType } from "./workflo/workflo";
 
 import './MainPanel.css';
 import { FailedConnector } from "./workflo/FailedConnector";

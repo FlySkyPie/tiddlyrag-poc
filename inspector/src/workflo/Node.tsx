@@ -1,6 +1,6 @@
 import React from "react";
 
-import { NodeType } from "./workflo";
+import type { NodeType } from "./workflo";
 
 import './Node.css';
 

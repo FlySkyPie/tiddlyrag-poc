@@ -5,7 +5,7 @@ import DialogContent from "@mui/material/DialogContent/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle/DialogTitle";
 
-import { DialogFieldType } from "./DialogTypes";
+import type { DialogFieldType } from "./DialogTypes";
 
 /**
  * The Dialog component props.

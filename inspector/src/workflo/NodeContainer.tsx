@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 
 import { Node } from './Node';
 
-import { NodeType, ChildNode } from "./workflo";
+import type { NodeType, ChildNode } from "./workflo";
 
 import './NodeContainer.css';
 

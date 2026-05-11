@@ -1,4 +1,4 @@
-import { DefaultNodeArgument } from './DefaultNode';
+import type { DefaultNodeArgument } from './DefaultNode';
 
 import './DefaultNodeGuardTag.css';
 
