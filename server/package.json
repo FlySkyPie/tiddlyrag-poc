@@ -27,7 +27,9 @@
     "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/platform-socket.io": "^11.1.19",
     "@nestjs/swagger": "^11.3.0",
+    "@nestjs/websockets": "^11.1.19",
     "@rekog/mcp-nest": "^1.9.9",
     "@types/pg": "^8.20.0",
     "axios": "^1.15.1",
@@ -43,6 +45,7 @@
     "picomatch": "^4.0.4",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
+    "socket.io": "^4.8.3",
     "tiddlywiki": "^5.3.8",
     "zod": "^4.3.6"
   },
