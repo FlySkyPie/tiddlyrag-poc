@@ -8,18 +8,19 @@ import Alert from "@mui/material/Alert/Alert";
 import Typography from "@mui/material/Typography/Typography";
 import { Chip, Divider } from "@mui/material";
 
-import { DefinitionType } from "./App";
+// import { DefinitionType } from "./App";
 import { ExamplesMenu } from "./ExamplesMenu";
 import type { Example } from "./Examples";
 
 import './DefinitionTab.css';
+import { DefinitionType, type IDefinitionType } from "./constants/DefinitionType";
 
 export type DefinitionTabProps = {
     /** The definition value. */
     definition: string;
 
     /** The definition value. */
-    definitionType: DefinitionType;
+    definitionType: IDefinitionType;
 
     /** The callback for definition value changes. */
     onChange(value: string): void

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useCallback } from 'react';
 import { State, BehaviourTree, type NodeDetails } from "mistreevous";
 import { toast, ToastContainer } from 'react-toastify';
 
@@ -10,18 +11,12 @@ import Grid from '@mui/material/Grid';
 
 import { type CanvasElements, MainPanel } from './MainPanel';
 
-export enum SidebarTab { Definition = 0, Board = 1 };
-
-export enum DefinitionType { None = 0, MDSL = 1, JSON = 2 };
-
 /**
  * The App component state.
  */
 export type AppState = {
 	layoutId: string | null;
-	activeSidebarTab: SidebarTab;
 	definition: string;
-	definitionType: DefinitionType;
 	agent: string;
 	agentExceptionMessage: string;
 	behaviourTree: BehaviourTree | null;
@@ -29,6 +24,32 @@ export type AppState = {
 	behaviourTreePlayInterval: NodeJS.Timer | null;
 	canvasElements: CanvasElements;
 }
+
+export const AppFC: React.FC = () => {
+	/**
+	 * @todo Add multiple useState to stored
+	 */
+
+	const onPlayButtonPressed = useCallback(()=>{},[]);
+
+	return (
+		<Box className="app-box">
+			<Grid container sx={{ flexGrow: 1 }}>
+				<MainPanel
+					layoutId={layoutId}
+					elements={canvasElements}
+					showPlayButton={!!behaviourTree && !behaviourTreePlayInterval}
+					showReplayButton={!!behaviourTreePlayInterval}
+					showStopButton={!!behaviourTreePlayInterval}
+					onPlayButtonClick={() => onPlayButtonPressed()}
+					onReplayButtonClick={() => onPlayButtonPressed()}
+					onStopButtonClick={() => { }}
+				/>
+				<ToastContainer />
+			</Grid>
+		</Box>
+	);
+};
 
 /**
  * The App component.
@@ -44,9 +65,7 @@ export class App extends React.Component<{}, AppState> {
 		// Set the initial state for the component.
 		this.state = {
 			layoutId: null,
-			activeSidebarTab: SidebarTab.Definition,
 			definition: "",
-			definitionType: DefinitionType.None,
 			agent: "class Agent {}",
 			agentExceptionMessage: "",
 			behaviourTree: null,
@@ -63,17 +82,17 @@ export class App extends React.Component<{}, AppState> {
 		return (
 			<Box className="app-box">
 				<Grid container sx={{ flexGrow: 1 }}>
-						<MainPanel
-							layoutId={this.state.layoutId}
-							elements={this.state.canvasElements}
-							showPlayButton={!!this.state.behaviourTree && !this.state.behaviourTreePlayInterval}
-							showReplayButton={!!this.state.behaviourTreePlayInterval}
-							showStopButton={!!this.state.behaviourTreePlayInterval}
-							onPlayButtonClick={() => this._onPlayButtonPressed()}
-							onReplayButtonClick={() => this._onPlayButtonPressed()}
-							onStopButtonClick={() => {}}
-						/>
-						<ToastContainer />
+					<MainPanel
+						layoutId={this.state.layoutId}
+						elements={this.state.canvasElements}
+						showPlayButton={!!this.state.behaviourTree && !this.state.behaviourTreePlayInterval}
+						showReplayButton={!!this.state.behaviourTreePlayInterval}
+						showStopButton={!!this.state.behaviourTreePlayInterval}
+						onPlayButtonClick={() => this._onPlayButtonPressed()}
+						onReplayButtonClick={() => this._onPlayButtonPressed()}
+						onStopButtonClick={() => { }}
+					/>
+					<ToastContainer />
 				</Grid>
 			</Box>
 		);
@@ -104,20 +123,20 @@ export class App extends React.Component<{}, AppState> {
 
 			if (parentId) {
 				let variant;
-				
+
 				switch (node.state) {
 					case State.RUNNING:
 						variant = "active";
 						break;
-	
+
 					case State.SUCCEEDED:
 						variant = "succeeded";
 						break;
-					
+
 					case State.FAILED:
 						variant = "failed";
 						break;
-	
+
 					default:
 						variant = "default";
 				}
