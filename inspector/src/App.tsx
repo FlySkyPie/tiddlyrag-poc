@@ -25,90 +25,13 @@ export type AppState = {
 	canvasElements: CanvasElements;
 }
 
-export const AppFC: React.FC = () => {
+export const App: React.FC = () => {
 	const [layoutId, setLayoutId] = useState<string | null>(null);
-	const [definition, setDefinition] = useState<string>("");
-	const [agent, setAgent] = useState<string>("class Agent {}");
-	const [agentExceptionMessage, setAgentExceptionMessage] = useState<string>("");
 	const [behaviourTree, setBehaviourTree] = useState<BehaviourTree | null>(null);
-	const [behaviourTreeExceptionMessage, setBehaviourTreeExceptionMessage] = useState<string>("");
 	const [behaviourTreePlayInterval, setBehaviourTreePlayInterval] = useState<NodeJS.Timer | null>(null);
 	const [canvasElements, setCanvasElements] = useState<CanvasElements>({ nodes: [], edges: [] });
 
-	const onPlayButtonPressed = useCallback(()=>{},[]);
-
-	return (
-		<Box className="app-box">
-			<Grid container sx={{ flexGrow: 1 }}>
-				<MainPanel
-					layoutId={layoutId}
-					elements={canvasElements}
-					showPlayButton={!!behaviourTree && !behaviourTreePlayInterval}
-					showReplayButton={!!behaviourTreePlayInterval}
-					showStopButton={!!behaviourTreePlayInterval}
-					onPlayButtonClick={() => onPlayButtonPressed()}
-					onReplayButtonClick={() => onPlayButtonPressed()}
-					onStopButtonClick={() => { }}
-				/>
-				<ToastContainer />
-			</Grid>
-		</Box>
-	);
-};
-
-/**
- * The App component.
- */
-export class App extends React.Component<{}, AppState> {
-	/**
-	 * Creates the App element.
-	 * @param props The control properties.
-	 */
-	public constructor(props: any) {
-		super(props);
-
-		// Set the initial state for the component.
-		this.state = {
-			layoutId: null,
-			definition: "",
-			agent: "class Agent {}",
-			agentExceptionMessage: "",
-			behaviourTree: null,
-			behaviourTreeExceptionMessage: "",
-			behaviourTreePlayInterval: null,
-			canvasElements: { nodes: [], edges: [] }
-		};
-	}
-
-	/**
-	 * Renders the component.
-	 */
-	public render(): React.ReactNode {
-		return (
-			<Box className="app-box">
-				<Grid container sx={{ flexGrow: 1 }}>
-					<MainPanel
-						layoutId={this.state.layoutId}
-						elements={this.state.canvasElements}
-						showPlayButton={!!this.state.behaviourTree && !this.state.behaviourTreePlayInterval}
-						showReplayButton={!!this.state.behaviourTreePlayInterval}
-						showStopButton={!!this.state.behaviourTreePlayInterval}
-						onPlayButtonClick={() => this._onPlayButtonPressed()}
-						onReplayButtonClick={() => this._onPlayButtonPressed()}
-						onStopButtonClick={() => { }}
-					/>
-					<ToastContainer />
-				</Grid>
-			</Box>
-		);
-	}
-
-	/**
-	 * Parse the nodes and connectors.
-	 * @param flattenedNodeDetails 
-	 * @returns The parsed nodes and connectors.
-	 */
-	private _createCanvasElements(rootNodeDetails: NodeDetails): CanvasElements {
+	const _createCanvasElements = useCallback((rootNodeDetails: NodeDetails): CanvasElements => {
 		const result: CanvasElements = { nodes: [], edges: [] };
 
 		const processNodeDetails = (node: NodeDetails, parentId?: string) => {
@@ -160,11 +83,9 @@ export class App extends React.Component<{}, AppState> {
 		processNodeDetails(rootNodeDetails);
 
 		return result;
-	}
+	}, []);
 
-	private _onPlayButtonPressed(): void {
-		const { behaviourTree, behaviourTreePlayInterval } = this.state;
-
+	const onPlayButtonPressed = useCallback(() => {
 		// There is nothing to de if we have no behaviour tree instance.
 		if (!behaviourTree) {
 			return;
@@ -186,7 +107,7 @@ export class App extends React.Component<{}, AppState> {
 			} catch (exception: any) {
 				// Clear the interval.
 				clearInterval(playInterval);
-				this.setState({ behaviourTreePlayInterval: null });
+				setBehaviourTreePlayInterval(null);
 
 				// Reset the tree.
 				behaviourTree.reset();
@@ -199,13 +120,32 @@ export class App extends React.Component<{}, AppState> {
 			if (!behaviourTree.isRunning()) {
 				// Clear the interval.
 				clearInterval(playInterval);
-				this.setState({ behaviourTreePlayInterval: null });
+				setBehaviourTreePlayInterval(null);
 			}
 
-			this.setState({ canvasElements: this._createCanvasElements(behaviourTree.getTreeNodeDetails()) });
+			setCanvasElements(
+				_createCanvasElements(behaviourTree.getTreeNodeDetails())
+			);
 		}, 100);
 
-		this.setState({ behaviourTreePlayInterval: playInterval });
-	}
+		setBehaviourTreePlayInterval(playInterval);
+	}, [_createCanvasElements, behaviourTree, behaviourTreePlayInterval]);
 
-}
+	return (
+		<Box className="app-box">
+			<Grid container sx={{ flexGrow: 1 }}>
+				<MainPanel
+					layoutId={layoutId}
+					elements={canvasElements}
+					showPlayButton={!!behaviourTree && !behaviourTreePlayInterval}
+					showReplayButton={!!behaviourTreePlayInterval}
+					showStopButton={!!behaviourTreePlayInterval}
+					onPlayButtonClick={() => onPlayButtonPressed()}
+					onReplayButtonClick={() => onPlayButtonPressed()}
+					onStopButtonClick={() => { }}
+				/>
+				<ToastContainer />
+			</Grid>
+		</Box>
+	);
+};
