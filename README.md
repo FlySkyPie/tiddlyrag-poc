@@ -1,46 +1,79 @@
-# Getting Started with Create React App
+# Mistreevous Visualiser
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+An interactive web-based visualiser and playground for [Mistreevous](https://github.com/nikkorn/mistreevous), a behaviour tree library written in TypeScript.
 
-## Available Scripts
+Define behaviour trees using MDSL (Mistreevous Domain Specific Language) or JSON, wire up an agent, and watch the tree execute in real time with a visual node graph.
 
-In the project directory, you can run:
+## Features
 
-### `npm start`
+- Write behaviour tree definitions in MDSL or JSON with syntax highlighting
+- Auto-detection of definition format (MDSL/JSON)
+- Convert MDSL definitions to JSON
+- Define agent classes with custom actions, conditions, and guards
+- Step through tree execution visually with play, replay, and stop controls
+- Interactive canvas with auto-layout and fit-to-screen
+- Built-in examples covering leaf nodes, composites, decorators, guards, callbacks, and more
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Getting Started
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### Prerequisites
 
-### `npm test`
+This project depends on a local copy of the `mistreevous` package (linked via `file:../mistreevous` in `package.json`). Make sure you have the [mistreevous](https://github.com/nikkorn/mistreevous) repository cloned as a sibling directory before installing dependencies.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Installation
 
-### `npm run build`
+```bash
+npm install
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Development
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```bash
+npm start
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Runs the app in development mode at [http://localhost:3000](http://localhost:3000).
 
-### `npm run eject`
+### Build
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```bash
+npm run build
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Builds the app for production into the `build` folder and copies the output to `docs` for GitHub Pages deployment.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## Usage
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+1. Write a behaviour tree definition in the **Definition** panel (left side) using MDSL or JSON.
+2. Define an **Agent** class in the panel below with the actions and conditions referenced in your tree.
+3. Press the **Play** button to step through the tree and watch nodes transition between states on the canvas.
+4. Use the **Examples** menu to load pre-built demonstrations of different node types and patterns.
 
-## Learn More
+### Example (MDSL)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```
+root {
+    selector {
+        sequence {
+            condition [HasDollars, 15]
+            action [OrderFood, "Pizza"]
+        }
+        sequence {
+            condition [HasIngredient, "Egg"]
+            action [CookFood, "Omelette"]
+        }
+        action [Starve]
+    }
+}
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Tech Stack
+
+- React 18 + TypeScript
+- Material UI 5
+- Ace Editor (code editing with custom MDSL mode)
+- ELK.js (graph layout)
+
+## License
+
+MIT — see [LICENSE](./LICENSE) for details.
