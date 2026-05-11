@@ -1,0 +1,49 @@
+.guard-tag {
+    display: flex;
+    flex-direction: row;
+    margin: 2px;
+    font-size: 0.8rem;
+    border: #be2f5f 1px solid;
+    background-color: white;
+    border-radius: 5px;
+}
+
+.guard-tag-type {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4px 6px;
+    color: white;
+    background-color: #be2f5f;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+
+.guard-tag-resolved-state {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4px 6px;
+    color: white;
+    background-color: #be2f5f;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+.guard-tag-signature {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    padding: 4px 6px;
+}
+
+.guard-tag p {
+    margin: 0px;
+}
+
+.guard-tag .default-node-argument {
+    padding: 3px;
+    margin: 0px;
+    margin-left: 4px;
+    line-height: 1rem;
+}

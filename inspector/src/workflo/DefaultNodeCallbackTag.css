@@ -1,0 +1,38 @@
+.callback-tag {
+    display: flex;
+    flex-direction: row;
+    margin: 2px;
+    font-size: 0.8rem;
+    border: #3137ac 1px solid;
+    background-color: white;
+    border-radius: 5px;
+}
+
+.callback-tag-type {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4px 6px;
+    color: white;
+    background-color: #3137ac;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+
+.callback-tag-signature {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    padding: 4px 6px;
+}
+
+.callback-tag p {
+    margin: 0px;
+}
+
+.callback-tag .default-node-argument {
+    padding: 3px;
+    margin: 0px;
+    margin-left: 4px;
+    line-height: 1rem;
+}

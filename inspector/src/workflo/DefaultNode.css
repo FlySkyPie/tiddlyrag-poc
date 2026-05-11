@@ -1,0 +1,159 @@
+.workflow-canvas-default-node {
+    display: inline-block;
+    padding: 4px;
+    border: #868686 1px solid;
+    border-radius: 5px;
+    background-color: white;
+    white-space: nowrap;
+}
+
+.workflow-canvas-default-node.running {
+    border: #0388fc 1px solid;
+}
+
+.workflow-canvas-default-node.succeeded {
+    border: #02c93e 1px solid;
+    background-color: #d1ffde;
+}
+
+.workflow-canvas-default-node.failed {
+    border: #e63b02 1px solid;
+    background-color: #ffe5e5;
+}
+
+.workflow-canvas-default-node > p {
+    margin: 0px;
+}
+
+.default-node-main-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.default-node-info-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.default-node-signature-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.default-node-icon.action {
+    background-color: #3772ff;
+}
+
+.default-node-icon.condition {
+    background-color: #eac435;
+}
+
+.default-node-icon.selector {
+    background-color: #54478c;
+}
+
+.default-node-icon.sequence {
+    background-color: #e40066;
+}
+
+.default-node-icon.parallel {
+    background-color: #0db39e;
+}
+
+.default-node-icon.race {
+    background-color: #16db93;
+}
+
+.default-node-icon.all {
+    background-color: #16db93;
+}
+
+.default-node-icon.repeat {
+    background-color: #6c91bf;
+}
+
+.default-node-icon.retry {
+    background-color: #a14ebf;
+}
+
+.default-node-icon.while {
+    background-color: #f1c453;
+}
+
+.default-node-icon.root {
+    background-color: rgb(99, 98, 104);
+}
+
+.default-node-icon.flip {
+    background-color: #f29e4c;
+}
+
+.default-node-icon.succeed {
+    background-color: rgb(0, 190, 32);
+}
+
+.default-node-icon.fail {
+    background-color: rgb(226, 64, 36);
+}
+
+.default-node-icon.lotto {
+    background-color: #83e377;
+}
+
+.default-node-icon.wait {
+    background-color: #826aed;
+}
+
+.default-node-caption {
+    margin: 0px 5px 0px 8px;
+    line-height: 26px;
+}
+
+.default-node-icon {
+    display: block;
+    background-color: #4a4a4a;
+    width: 20px;
+    height: 20px;
+    padding: 3px;
+    border-radius: 5px;
+}
+
+.default-node-argument {
+    margin: 0px 2px 0px 2px;
+    padding: 0px 6px;
+    line-height: 26px;
+    background-color: #eeeeee;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.default-node-argument.string {
+    color: #d80085;
+}
+
+.default-node-argument.number {
+    color: #29c29c;
+}
+
+.default-node-argument.boolean {
+    color: #902fff;
+}
+
+.default-node-argument.null {
+    color: #517075;
+}
+
+.default-node-argument.agent-property-reference {
+    color: #009fc7;
+}
+
+.default-node-argument.unknown {
+    color: #ff4b5a;
+}
+
+.default-node-guard-callback-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}

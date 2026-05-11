@@ -1,0 +1,8 @@
+.agent-tab {
+    display: flex;
+    flex-direction: column;
+}
+
+.agent-tab-ace-editor {
+    flex-grow: 1;
+}
