@@ -20,7 +20,7 @@ export class AgentGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor() {}
 
   handleConnection(socket: Socket) {
-    this.agentMap.set(socket.id, new AgentSession());
+    this.agentMap.set(socket.id, new AgentSession(socket));
 
     console.log(`Client ${socket.id} is connected.`);
   }

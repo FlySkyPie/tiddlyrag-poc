@@ -1,17 +1,21 @@
+import type { Socket } from 'socket.io';
 import { BehaviourTree } from 'mistreevous';
 
-import { FallNode } from 'src/core/behavior-tree/nodes/fall.node';
-import { LaughNode } from 'src/core/behavior-tree/nodes/laugh.node';
-import { WalkNode } from 'src/core/behavior-tree/nodes/walk.node';
+import { FallNode } from '../../core/behavior-tree/nodes/fall.node';
+import { LaughNode } from '../../core/behavior-tree/nodes/laugh.node';
+import { WalkNode } from '../../core/behavior-tree/nodes/walk.node';
+
 import { NodesAdapter } from '../behavior-tree/adapter/nodes-adapter';
 import { WorldAdapter } from '../world/adapter/world-adapter';
+
+import type { IAgentBridgeServer2Client as IAgentEventMap } from './interfaces/agent-bridge';
 
 export class AgentSession {
   private behaviourTree: BehaviourTree | null;
 
   private timer: NodeJS.Timeout | null = null;
 
-  constructor() {
+  constructor(private socket: Socket<IAgentEventMap>) {
     const definition = `root {
     sequence {
         action [Walk]
@@ -39,8 +43,11 @@ export class AgentSession {
 
   public start() {
     this.timer = setInterval(() => {
-      this.behaviourTree?.step();
-      //   console.log('Tree:', this.behaviourTree.getState());
+      if (!this.behaviourTree) {
+        return;
+      }
+      this.behaviourTree.step();
+      this.socket.emit('updateDetail', this.behaviourTree.getTreeNodeDetails());
     }, 100);
   }
 
