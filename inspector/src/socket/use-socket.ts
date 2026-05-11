@@ -17,15 +17,17 @@ export const useSocket = ({ onDetailUpdated }: IProps) => {
 
     useEffect(() => {
         function handleConnect() {
-
+            console.log('Connected!');
         }
 
         function handleDisconnect() {
-
+            console.log('Disconnected!');
         }
 
         const handleUpdateDetail = (value: NodeDetails) => {
-            onDetailUpdatedRef.current(value);
+            if (onDetailUpdatedRef.current) {
+                onDetailUpdatedRef.current(value);
+            }
         }
 
         socket.on('connect', handleConnect);
