@@ -1,5 +1,7 @@
 import type { Socket } from 'socket.io';
+import type { NodeDetails } from 'mistreevous';
 import { BehaviourTree } from 'mistreevous';
+import { diff } from 'jsondiffpatch';
 
 import type { IGiteaRepository } from '../../core/repository/gitea.repository';
 import { FallNode } from '../../core/behavior-tree/nodes/fall.node';
@@ -19,6 +21,8 @@ import type { StartTraversalDto } from './dto/start-traversal.dto';
 
 export class AgentSession {
   private behaviourTree: BehaviourTree | null;
+
+  private latestTree: NodeDetails;
 
   private timer: NodeJS.Timeout | null = null;
 
@@ -53,6 +57,9 @@ export class AgentSession {
 
     this.behaviourTree = new BehaviourTree(definition, nodesAdapter.nodes);
 
+    this.latestTree = this.behaviourTree.getTreeNodeDetails();
+    socket.emit('btInit', this.latestTree);
+
     this.start();
   }
 
@@ -62,7 +69,13 @@ export class AgentSession {
         return;
       }
       this.behaviourTree.step();
-      this.socket.emit('updateDetail', this.behaviourTree.getTreeNodeDetails());
+
+      const previous = this.latestTree;
+      this.latestTree = this.behaviourTree.getTreeNodeDetails();
+      const delta = diff(previous, this.latestTree);
+      if (delta) {
+        this.socket.emit('btUpdated', delta);
+      }
     }, 100);
   }
 

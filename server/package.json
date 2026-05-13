@@ -36,6 +36,7 @@
     "fast-xml-parser": "^5.7.3",
     "gitea-js": "^1.23.0",
     "handlebars": "^4.7.9",
+    "jsondiffpatch": "^0.7.3",
     "kysely": "^0.28.16",
     "miniplex": "^2.0.0",
     "mistreevous": "^4.3.1",
