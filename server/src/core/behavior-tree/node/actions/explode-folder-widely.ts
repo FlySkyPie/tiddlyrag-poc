@@ -3,7 +3,7 @@ import type { IGiteaRepository } from '../../../repository/gitea.repository';
 
 import type { TickableActionNode } from '../../interfaces/tickable-action-node';
 
-export class ExplodeFolderDepthlyNode implements TickableActionNode {
+export class ExplodeFolderWidelyNode implements TickableActionNode {
   constructor(
     private readonly worldProvider: IWorldProvider,
     private readonly giteaRepository: IGiteaRepository,
@@ -20,29 +20,29 @@ export class ExplodeFolderDepthlyNode implements TickableActionNode {
       };
       depth: number;
     }
-    let mostDepthFolder: IFolder | null = null;
+    let lessDepthFolder: IFolder | null = null;
     for (const folder of unExploredFolders) {
-      if (!mostDepthFolder) {
+      if (!lessDepthFolder) {
         const depth = folder.fsPath.split('/').length;
-        mostDepthFolder = {
+        lessDepthFolder = {
           folderEntity: folder,
           depth,
         };
         continue;
       }
       const depth = folder.fsPath.split('/').length;
-      if (depth > mostDepthFolder.depth) {
-        mostDepthFolder = {
+      if (depth < lessDepthFolder.depth) {
+        lessDepthFolder = {
           folderEntity: folder,
           depth,
         };
       }
     }
 
-    if (!mostDepthFolder) {
+    if (!lessDepthFolder) {
       return true;
     }
-    const { repo, fsPath, owner } = mostDepthFolder.folderEntity;
+    const { repo, fsPath, owner } = lessDepthFolder.folderEntity;
     const result = await this.giteaRepository.readPath(repo, fsPath);
     for (const conent of result) {
       if (conent.type === 'file') {
@@ -82,7 +82,7 @@ export class ExplodeFolderDepthlyNode implements TickableActionNode {
     }
 
     this.worldProvider.addComponent(
-      mostDepthFolder.folderEntity,
+      lessDepthFolder.folderEntity,
       'isExplored',
       true,
     );

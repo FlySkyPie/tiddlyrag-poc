@@ -4,11 +4,9 @@ import { BehaviourTree } from 'mistreevous';
 import { diff } from 'jsondiffpatch';
 
 import type { IGiteaRepository } from '../../core/repository/gitea.repository';
-import { FallNode } from '../../core/behavior-tree/nodes/fall.node';
-import { LaughNode } from '../../core/behavior-tree/nodes/laugh.node';
-import { WalkNode } from '../../core/behavior-tree/nodes/walk.node';
 import { IsExplorableNode } from '../../core/behavior-tree/node/conditions/is-explorable';
 import { ExplodeFolderDepthlyNode } from '../../core/behavior-tree/node/actions/explode-folder-depthly';
+import { ExplodeFolderWidelyNode } from '../../core/behavior-tree/node/actions/explode-folder-widely';
 
 import { NodesAdapter } from '../behavior-tree/adapter/nodes-adapter';
 import { WorldAdapter } from '../world/adapter/world-adapter';
@@ -51,9 +49,10 @@ export class AgentSession {
         'ExplodeFolderDepthly',
         new ExplodeFolderDepthlyNode(this.worldAdapter, this.giteaRepository),
       )
-      .registerAction('Walk', new WalkNode(this.worldAdapter))
-      .registerAction('Fall', new FallNode())
-      .registerAction('Laugh', new LaughNode());
+      .registerAction(
+        'ExplodeFolderWidely',
+        new ExplodeFolderWidelyNode(this.worldAdapter, this.giteaRepository),
+      );
 
     this.behaviourTree = new BehaviourTree(definition, nodesAdapter.nodes);
 

@@ -44,9 +44,15 @@ export class NodesAdapter {
                 resolve(State.SUCCEEDED);
               }
             })
-            .catch(() => resolve(State.FAILED));
+            .catch((error: unknown) => {
+              console.warn(
+                `Async action "${name}" error occurred: ${String(error)}`,
+              );
+              resolve(State.FAILED);
+            });
         });
-      } catch (_: unknown) {
+      } catch (error: unknown) {
+        console.warn(`Async action "${name}" error occurred: ${String(error)}`);
         return State.FAILED;
       }
     };
