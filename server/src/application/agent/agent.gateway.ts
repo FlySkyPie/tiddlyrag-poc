@@ -11,6 +11,8 @@ import {
 import type { StartTraversalDto } from '../../infrastructure/agent/dto/start-traversal.dto';
 import { AgentSession } from '../../infrastructure/agent/agent.session';
 
+import { GiteaRepository } from '../gitea/gitea.repository';
+
 @WebSocketGateway({
   cors: {
     origin: '*',
@@ -19,10 +21,13 @@ import { AgentSession } from '../../infrastructure/agent/agent.session';
 export class AgentGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private agentMap: Map<string, AgentSession> = new Map();
 
-  constructor() {}
+  constructor(private readonly giteaRepository: GiteaRepository) {}
 
   handleConnection(socket: Socket) {
-    this.agentMap.set(socket.id, new AgentSession(socket));
+    this.agentMap.set(
+      socket.id,
+      new AgentSession(socket, this.giteaRepository),
+    );
 
     console.log(`Client ${socket.id} is connected.`);
   }

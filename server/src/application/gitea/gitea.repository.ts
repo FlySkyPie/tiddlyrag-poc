@@ -8,8 +8,10 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import picomatch from 'picomatch';
 
+import type { IGiteaRepository } from '../../core/repository/gitea.repository';
+
 @Injectable()
-export class GiteaRepository {
+export class GiteaRepository implements IGiteaRepository {
   private readonly credentials: string;
   private readonly user: string;
   private readonly baseURL: string;

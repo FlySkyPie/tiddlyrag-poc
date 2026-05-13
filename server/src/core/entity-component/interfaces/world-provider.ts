@@ -10,7 +10,7 @@ export interface Query<E> {
 }
 
 export type IUnExploredFolders = Query<
-  Pick<Entity, 'owner' | 'repo' | 'fsName' | 'fsPath' | 'isFsDir'>
+  Required<Pick<Entity, 'owner' | 'repo' | 'fsName' | 'fsPath' | 'isFsDir'>>
 >;
 
 export interface IWorldProvider {

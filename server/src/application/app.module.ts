@@ -10,7 +10,7 @@ import { AgentModule } from './agent/agent.module';
 
 @Module({
   imports: [
-    // GiteaModule,
+    GiteaModule,
     // DatabaseModule,
     AgentModule,
     ConfigModule.forRoot({

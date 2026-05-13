@@ -1,10 +1,12 @@
 import type { Socket } from 'socket.io';
 import { BehaviourTree } from 'mistreevous';
 
+import type { IGiteaRepository } from '../../core/repository/gitea.repository';
 import { FallNode } from '../../core/behavior-tree/nodes/fall.node';
 import { LaughNode } from '../../core/behavior-tree/nodes/laugh.node';
 import { WalkNode } from '../../core/behavior-tree/nodes/walk.node';
 import { IsExplorableNode } from '../../core/behavior-tree/node/conditions/is-explorable';
+import { ExplodeFolderDepthlyNode } from '../../core/behavior-tree/node/actions/explode-folder-depthly';
 
 import { NodesAdapter } from '../behavior-tree/adapter/nodes-adapter';
 import { WorldAdapter } from '../world/adapter/world-adapter';
@@ -22,14 +24,14 @@ export class AgentSession {
 
   private worldAdapter: WorldAdapter;
 
-  constructor(private socket: Socket<ListenEvents, EmitEvents>) {
+  constructor(
+    private readonly socket: Socket<ListenEvents, EmitEvents>,
+    private readonly giteaRepository: IGiteaRepository,
+  ) {
     const definition = `root {
     sequence {
-        action [Walk]
-        wait [1000]
-        action [Fall]
-        wait [1000]
-        action [Laugh]
+        condition [IsExplorable]
+        action [ExplodeFolderDepthly]
     }
 }`;
 
@@ -40,6 +42,10 @@ export class AgentSession {
       .registerCondition(
         'IsExplorable',
         new IsExplorableNode(this.worldAdapter),
+      )
+      .registerAction(
+        'ExplodeFolderDepthly',
+        new ExplodeFolderDepthlyNode(this.worldAdapter, this.giteaRepository),
       )
       .registerAction('Walk', new WalkNode(this.worldAdapter))
       .registerAction('Fall', new FallNode())
