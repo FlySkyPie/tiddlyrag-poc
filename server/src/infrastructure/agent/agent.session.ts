@@ -32,9 +32,9 @@ export class AgentSession {
     worldAdapter.addEntity({ title: 'Sample' });
 
     nodesAdapter
-      .register('Walk', new WalkNode(worldAdapter))
-      .register('Fall', new FallNode())
-      .register('Laugh', new LaughNode());
+      .registerAction('Walk', new WalkNode(worldAdapter))
+      .registerAction('Fall', new FallNode())
+      .registerAction('Laugh', new LaughNode());
 
     this.behaviourTree = new BehaviourTree(definition, nodesAdapter.nodes);
 
