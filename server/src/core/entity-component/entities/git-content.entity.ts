@@ -1,5 +1,15 @@
 export interface GitContentEntity {
   /**
+   * owner of the repo
+   */
+  owner: string;
+
+  /**
+   * name of the repo
+   */
+  repo: string;
+
+  /**
    * `content` is populated when `type` is `file`, otherwise null
    */
   content?: string;
@@ -28,4 +38,9 @@ export interface GitContentEntity {
    * `encoding` is populated when `type` is `file`, otherwise null
    */
   fsEncoding?: string;
+
+  /**
+   * The flag of chilren items are explored when the item is folder.
+   */
+  isExplored: boolean;
 }

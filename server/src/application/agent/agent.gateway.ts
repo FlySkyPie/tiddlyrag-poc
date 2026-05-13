@@ -1,5 +1,6 @@
 import type { Socket } from 'socket.io';
 import {
+  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -7,6 +8,7 @@ import {
   WebSocketGateway,
 } from '@nestjs/websockets';
 
+import type { StartTraversalDto } from '../../infrastructure/agent/dto/start-traversal.dto';
 import { AgentSession } from '../../infrastructure/agent/agent.session';
 
 @WebSocketGateway({
@@ -34,8 +36,15 @@ export class AgentGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`Client ${socket.id} disconnected.`);
   }
 
-  @SubscribeMessage('events')
-  handleEvent(@MessageBody() data: string): string {
-    return data;
+  @SubscribeMessage('start')
+  handleStart(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() data: StartTraversalDto,
+  ) {
+    const agent = this.agentMap.get(socket.id);
+    if (!agent) {
+      return;
+    }
+    agent.createTraversalRoot(data);
   }
 }

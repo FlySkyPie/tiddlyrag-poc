@@ -8,14 +8,20 @@ import { WalkNode } from '../../core/behavior-tree/nodes/walk.node';
 import { NodesAdapter } from '../behavior-tree/adapter/nodes-adapter';
 import { WorldAdapter } from '../world/adapter/world-adapter';
 
-import type { IAgentBridgeServer2Client as IAgentEventMap } from './interfaces/agent-bridge';
+import type {
+  IAgentBridgeServer2Client as EmitEvents,
+  IAgentBridgeClient2Server as ListenEvents,
+} from './interfaces/agent-bridge';
+import type { StartTraversalDto } from './dto/start-traversal.dto';
 
 export class AgentSession {
   private behaviourTree: BehaviourTree | null;
 
   private timer: NodeJS.Timeout | null = null;
 
-  constructor(private socket: Socket<IAgentEventMap>) {
+  private worldAdapter: WorldAdapter;
+
+  constructor(private socket: Socket<ListenEvents, EmitEvents>) {
     const definition = `root {
     sequence {
         action [Walk]
@@ -27,12 +33,10 @@ export class AgentSession {
 }`;
 
     const nodesAdapter = new NodesAdapter();
-    const worldAdapter = new WorldAdapter();
-
-    worldAdapter.addEntity({ title: 'Sample' });
+    this.worldAdapter = new WorldAdapter();
 
     nodesAdapter
-      .registerAction('Walk', new WalkNode(worldAdapter))
+      .registerAction('Walk', new WalkNode(this.worldAdapter))
       .registerAction('Fall', new FallNode())
       .registerAction('Laugh', new LaughNode());
 
@@ -57,5 +61,17 @@ export class AgentSession {
       this.timer = null;
     }
     this.behaviourTree = null;
+  }
+
+  public createTraversalRoot({ owner, repo }: StartTraversalDto) {
+    this.worldAdapter.addEntity({
+      owner,
+      repo,
+      fsPath: '.',
+      fsName: '.',
+      fsSize: 0,
+      fsType: 'dir',
+      isExplored: false,
+    });
   }
 }
