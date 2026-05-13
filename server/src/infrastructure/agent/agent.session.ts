@@ -4,6 +4,7 @@ import { BehaviourTree } from 'mistreevous';
 import { FallNode } from '../../core/behavior-tree/nodes/fall.node';
 import { LaughNode } from '../../core/behavior-tree/nodes/laugh.node';
 import { WalkNode } from '../../core/behavior-tree/nodes/walk.node';
+import { IsExplorableNode } from '../../core/behavior-tree/node/conditions/is-explorable';
 
 import { NodesAdapter } from '../behavior-tree/adapter/nodes-adapter';
 import { WorldAdapter } from '../world/adapter/world-adapter';
@@ -36,6 +37,10 @@ export class AgentSession {
     this.worldAdapter = new WorldAdapter();
 
     nodesAdapter
+      .registerCondition(
+        'IsExplorable',
+        new IsExplorableNode(this.worldAdapter),
+      )
       .registerAction('Walk', new WalkNode(this.worldAdapter))
       .registerAction('Fall', new FallNode())
       .registerAction('Laugh', new LaughNode());
@@ -70,8 +75,8 @@ export class AgentSession {
       fsPath: '.',
       fsName: '.',
       fsSize: 0,
-      fsType: 'dir',
-      isExplored: false,
+      isFsDir: true,
+      isExplored: undefined,
     });
   }
 }

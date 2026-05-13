@@ -9,11 +9,17 @@ export interface Query<E> {
   };
 }
 
+export type IUnExploredFolders = Query<
+  Pick<Entity, 'owner' | 'repo' | 'fsName' | 'fsPath' | 'isFsDir'>
+>;
+
 export interface IWorldProvider {
   /**
    * Just a sample.
    */
   get withTitle(): Query<Pick<Entity, 'title'>>;
+
+  get unExploredFolders(): IUnExploredFolders;
 
   addEntity(entity: Entity): void;
 

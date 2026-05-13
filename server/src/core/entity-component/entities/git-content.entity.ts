@@ -30,9 +30,24 @@ export interface GitContentEntity {
   fsPath?: string;
 
   /**
-   * `type` will be `file`, `dir`, `symlink`, or `submodule`
+   * Flag determined the entity is file.
    */
-  fsType?: 'file' | 'dir' | 'symlink' | 'submodule';
+  isFsFile?: true;
+
+  /**
+   * Flag determined the entity is directory.
+   */
+  isFsDir?: true;
+
+  /**
+   * Flag determined the entity is symlink.
+   */
+  isFsSymlink?: true;
+
+  /**
+   * Flag determined the entity is submodule.
+   */
+  isFsSubmodule?: true;
 
   /**
    * `encoding` is populated when `type` is `file`, otherwise null
@@ -42,5 +57,5 @@ export interface GitContentEntity {
   /**
    * The flag of chilren items are explored when the item is folder.
    */
-  isExplored: boolean;
+  isExplored?: true;
 }
