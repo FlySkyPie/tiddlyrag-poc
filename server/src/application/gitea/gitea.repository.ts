@@ -1,9 +1,12 @@
+import type {
+  ContentsResponse,
+  Repository,
+  MigrateRepoOptions,
+} from 'gitea-js';
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import picomatch from 'picomatch';
-
-import type { ContentsResponse } from './interfaces/contents-response';
 
 @Injectable()
 export class GiteaRepository {
@@ -26,14 +29,14 @@ export class GiteaRepository {
   /**
    * Download a git repo from remote and stored into Gitea instance.
    */
-  async migrate(repoUrl: string, repoName: string): Promise<unknown> {
+  async migrate(repoUrl: string, repoName: string): Promise<Repository> {
     const url = new URL('/api/v1/repos/migrate', this.baseURL);
 
-    const request = {
+    const request: MigrateRepoOptions = {
       clone_addr: repoUrl,
       repo_name: repoName,
     };
-    const response = await this.httpService.axiosRef.post<unknown>(
+    const response = await this.httpService.axiosRef.post<Repository>(
       url.href,
       request,
       {
