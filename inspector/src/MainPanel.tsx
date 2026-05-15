@@ -34,7 +34,7 @@ export type MainPanelProps = {
 
     showStopButton: boolean;
 
-    onPlayButtonClick(): void;
+    onPlayButtonClick?:()=> void;
 
     onReplayButtonClick(): void;
 
@@ -85,11 +85,10 @@ export type MainPanelProps = {
                 }}
             />
             <div className="main-panel-fab-container">
-                {showPlayButton && (
-                    <Fab onClick={onPlayButtonClick} className="run-tree-fab main-panel-fab" size="medium" color="primary">
-                        <PlayArrow/>
-                    </Fab>
-                )}
+                <Fab onClick={onPlayButtonClick} className="run-tree-fab main-panel-fab" size="medium" color="primary">
+                    <PlayArrow/>
+                </Fab>
+              
                  {showReplayButton && (
                     <Fab onClick={onReplayButtonClick} className="run-tree-fab main-panel-fab" size="medium" color="primary">
                         <Repeat/>

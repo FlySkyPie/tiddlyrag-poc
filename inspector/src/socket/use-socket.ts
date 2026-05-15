@@ -1,5 +1,7 @@
 import type { NodeDetails } from 'mistreevous';
+import type { Delta } from 'jsondiffpatch';
 import { useEffect, useRef } from "react";
+import { patch } from 'jsondiffpatch';
 
 import { socket } from "./socket";
 
@@ -9,6 +11,7 @@ interface IProps {
 
 export const useSocket = ({ onDetailUpdated }: IProps) => {
     const onDetailUpdatedRef = useRef<((value: NodeDetails) => void) | undefined>(onDetailUpdated);
+    const lastRef = useRef<NodeDetails>();
 
     useEffect(() => {
         onDetailUpdatedRef.current = onDetailUpdated;
@@ -24,21 +27,26 @@ export const useSocket = ({ onDetailUpdated }: IProps) => {
             console.log('Disconnected!');
         }
 
-        const handleUpdateDetail = (value: NodeDetails) => {
-            if (onDetailUpdatedRef.current) {
-                onDetailUpdatedRef.current(value);
-            }
+        const handleBtInit = (value: NodeDetails) => {
+            lastRef.current = value;
+        }
+
+        const handleBtUpdated = (value: Delta) => {
+            lastRef.current = patch(lastRef.current,value) as any;
+            onDetailUpdatedRef.current(lastRef.current);
         }
 
         socket.on('connect', handleConnect);
         socket.on('disconnect', handleDisconnect);
-        socket.on('updateDetail', handleUpdateDetail);
+        socket.on('btInit', handleBtInit);
+        socket.on('btUpdated', handleBtUpdated);
 
 
         return () => {
             socket.off('connect', handleConnect);
             socket.off('disconnect', handleDisconnect);
-            socket.off('updateDetail', handleUpdateDetail);
+            socket.off('btInit', handleBtInit);
+            socket.off('btUpdated', handleBtUpdated);
         };
     }, []);
 };

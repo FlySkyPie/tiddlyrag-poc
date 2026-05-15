@@ -11,6 +11,7 @@ import Grid from '@mui/material/Grid';
 
 import { type CanvasElements, MainPanel } from './MainPanel';
 import { useSocket } from './socket/use-socket';
+import {socket} from './socket/socket';
 
 export const App: React.FC = () => {
 	const [canvasElements, setCanvasElements] = useState<CanvasElements>({ nodes: [], edges: [] });
@@ -80,7 +81,12 @@ export const App: React.FC = () => {
 					showPlayButton={false}
 					showReplayButton={false}
 					showStopButton={false}
-					onPlayButtonClick={() => { }}
+					onPlayButtonClick={() => { 
+						socket.emit('start',{
+							"owner": "myadmin",
+							"repo": "ariadne-gis"
+						})
+					}}
 					onReplayButtonClick={() => { }}
 					onStopButtonClick={() => { }}
 				/>
