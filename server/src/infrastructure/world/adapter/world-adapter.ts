@@ -1,4 +1,5 @@
 import { World } from 'miniplex';
+import { nanoid } from 'nanoid';
 
 import type { Entity } from '../../../core/entity-component/entities';
 import type {
@@ -31,7 +32,11 @@ export class WorldAdapter implements IWorldProvider {
   }
 
   addEntity(entity: Entity): void {
-    this._world.add(entity);
+    this._world.add(
+      Object.assign(entity, {
+        uid: nanoid(),
+      }),
+    );
   }
 
   removeEntity(entity: Entity): void {
@@ -45,5 +50,9 @@ export class WorldAdapter implements IWorldProvider {
     value: Entity[keyof Entity],
   ): void {
     this._world.addComponent(entity, key, value);
+  }
+
+  removeComponent(entity: Entity, key: keyof Entity): void {
+    this._world.removeComponent(entity, key);
   }
 }
