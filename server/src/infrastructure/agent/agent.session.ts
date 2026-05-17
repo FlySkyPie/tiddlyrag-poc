@@ -3,6 +3,7 @@ import type { NodeDetails } from 'mistreevous';
 import { BehaviourTree } from 'mistreevous';
 import { diff } from 'jsondiffpatch';
 
+import type { Entity } from '../../core/entity-component/entities';
 import type { IGiteaRepository } from '../../core/repository/gitea.repository';
 import { IsExplorableNode } from '../../core/behavior-tree/node/conditions/is-explorable';
 import { ExplodeFolderDepthlyNode } from '../../core/behavior-tree/node/actions/explode-folder-depthly';
@@ -38,7 +39,12 @@ export class AgentSession {
 }`;
 
     const nodesAdapter = new NodesAdapter();
+
     this.worldAdapter = new WorldAdapter();
+    this.worldAdapter
+      .on('entity-added', this.handleEntityAdded)
+      .on('entity-removed', this.handleEntityRemoved)
+      .on('entity-updated', this.handleEntityUpdated);
 
     nodesAdapter
       .registerCondition(
@@ -84,6 +90,7 @@ export class AgentSession {
       this.timer = null;
     }
     this.behaviourTree = null;
+    this.worldAdapter.dispose();
   }
 
   public createTraversalRoot({ owner, repo }: StartTraversalDto) {
@@ -97,4 +104,16 @@ export class AgentSession {
       isExplored: undefined,
     });
   }
+
+  private handleEntityAdded = (entity: Entity) => {
+    this.socket.emit('entityAdded', entity);
+  };
+
+  private handleEntityRemoved = (entity: Entity) => {
+    this.socket.emit('entityRemoved', entity);
+  };
+
+  private handleEntityUpdated = (entity: Entity) => {
+    this.socket.emit('entityUpdated', entity);
+  };
 }

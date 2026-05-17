@@ -33,6 +33,7 @@
     "@rekog/mcp-nest": "^1.9.9",
     "@types/pg": "^8.20.0",
     "axios": "^1.15.1",
+    "eventemitter3": "^5.0.4",
     "fast-xml-parser": "^5.7.3",
     "gitea-js": "^1.23.0",
     "handlebars": "^4.7.9",
