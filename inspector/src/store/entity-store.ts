@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-interface Entity {
+export interface Entity {
     uid: string;
 
     [key: string]: unknown;
@@ -18,10 +18,8 @@ interface EntityStore {
     select(value?: Entity): void;
 }
 
-const dummyData: Entity[] = Array.from({ length: 200 }, (_, i) => ({ uid: `${i}` }));
-
 export const useEntityStore = create<EntityStore>((set) => ({
-    entities: dummyData,
+    entities: [],
     add: (value: Entity) => {
         set(({ entities }) => {
             return { entities: [...entities, value] }

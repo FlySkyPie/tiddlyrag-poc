@@ -10,6 +10,12 @@ const ValueDisplay: React.FC<{ value: unknown }> = ({ value }) => {
     if (typeof value === 'string') {
         return value;
     }
+    if (typeof value === 'boolean') {
+        return String(value);
+    }
+    if (typeof value === 'number') {
+        return String(value);
+    }
     return "N/A"
 }
 
