@@ -5,7 +5,6 @@ import giteaConfig from './config/gitea';
 import openaiConfig from './config/openai';
 import databaseConfig from './config/database';
 import { GiteaModule } from './gitea/gitea.module';
-import { DatabaseModule } from './database/database.module';
 import { AgentModule } from './agent/agent.module';
 
 @Module({
