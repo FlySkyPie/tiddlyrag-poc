@@ -1,36 +1,15 @@
-# TiddlyRAG POC: Basic Use Case
+<div align="center">
+  <a href="https://flyskypie.github.io/tiddlyrag-planning/">
+    <img src="docs/logo.svg" alt="TiddlyRAG" width="300" height="auto" />
+  </a>
+  <p align="center">
+    <b>POC: Basic Use Case</b>
+  </p>
+</div>
 
-## What is TiddlyRAG?
+## What's TiddlyRAG?
 
-It's microservice used to providing knowledge about certain domain, and used by a RAG system.
-
-## What's the problems that TiddlyRAG trying solve?
-
-### Reuse RAG preprocessed knowledge
-
-As is known to everyone (consider you are read this RAG related project, I assume so), RAG would chunking text from input materials, some systems cutting it good and some systems bad, the chunking quality it's highly affect performance of the RAG system.
-
-So what if we can transfer knowledge (text chunk) between RAD databases?
-
-### Better Human Usability
-
-My definition of `llm.txt` is: a plain text file prepared for LLM, used to providing context.
-
-There alot of tools can create, generate, providing `llm.txt`, such as [repomix](https://github.com/yamadashy/repomix), [markitdown](https://github.com/microsoft/markitdown), Context7...put the chunking issue that I mentioned before beside, `llm.txt` it's very hard to read for human.
-
-Data cleansing is 101 of ETL,the truth of source for RAG can't easily been process by human, that's a problem.
-
-### TiddlyWiki
-
-But glad we don't need to reinvent wheel, a perfect solution for knowledge payload; an alternative of `llm.txt` already exist: TiddlyWiki.
-
-TiddlyWiki is a non-linear personal web notebook, more specificly, it's a single HTML containing both program and data, you can open it as SPA and read or edit notes.
-
-The philosophy of TiddlyWiki is very similar to Zettelkasten method, you make many Tiddler (card) in short of conent, and link them. So it present the chunking process naturally. The other hand "It's SPA" solving the problem human can't read or edit data easily.
-
-Plus, links between Tiddlers implicitly containing Graph information, they would be useful when you want to using Graph based RAG strategy.
-
-![](./docs/01_knowledge-reuse.webp)
+Please check [the planning repo](https://github.com/FlySkyPie/tiddlyrag-planning).
 
 ## What's this POC providing?
 
