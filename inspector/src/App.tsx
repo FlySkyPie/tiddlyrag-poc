@@ -11,7 +11,8 @@ import Grid from '@mui/material/Grid';
 
 import { type CanvasElements, MainPanel } from './MainPanel';
 import { useSocket } from './socket/use-socket';
-import {socket} from './socket/socket';
+import { socket } from './socket/socket';
+import { EntityList } from './components/EntityList';
 
 export const App: React.FC = () => {
 	const [canvasElements, setCanvasElements] = useState<CanvasElements>({ nodes: [], edges: [] });
@@ -75,21 +76,34 @@ export const App: React.FC = () => {
 	return (
 		<Box className="app-box">
 			<Grid container sx={{ flexGrow: 1 }}>
-				<MainPanel
-					layoutId={null}
-					elements={canvasElements}
-					showPlayButton={false}
-					showReplayButton={false}
-					showStopButton={false}
-					onPlayButtonClick={() => { 
-						socket.emit('start',{
-							"owner": "myadmin",
-							"repo": "ariadne-gis"
-						})
-					}}
-				/>
-				<ToastContainer />
+				<Grid
+					container
+					item
+					//   className={`sidebar ${isSidebarReadOnly ? "read-only" : ""}`} 
+					xs={12}
+					sm={2}
+					xl={2}
+					direction="column">
+					<EntityList />
+				</Grid>
+				<Grid item xs={12} sm={10} xl={10} >
+					<MainPanel
+						layoutId={null}
+						elements={canvasElements}
+						showPlayButton={false}
+						showReplayButton={false}
+						showStopButton={false}
+						onPlayButtonClick={() => {
+							socket.emit('start', {
+								"owner": "myadmin",
+								"repo": "ariadne-gis"
+							})
+						}}
+					/>
+				</Grid>
+
 			</Grid>
+			<ToastContainer />
 		</Box>
 	);
 };

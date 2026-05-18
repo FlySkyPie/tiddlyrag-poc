@@ -8,7 +8,7 @@
 .main-panel-fab-container {
     position: absolute;
     bottom: 0px;
-    left: 0px;
+    right: 0px;
     margin: 15px;
 }
 
