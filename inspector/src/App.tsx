@@ -13,6 +13,7 @@ import { type CanvasElements, MainPanel } from './MainPanel';
 import { useSocket } from './socket/use-socket';
 import { socket } from './socket/socket';
 import { EntityList } from './components/EntityList';
+import { EntityDetail } from './components/EntityDetail/EntityDetail';
 
 export const App: React.FC = () => {
 	const [canvasElements, setCanvasElements] = useState<CanvasElements>({ nodes: [], edges: [] });
@@ -79,12 +80,15 @@ export const App: React.FC = () => {
 				<Grid
 					container
 					item
-					//   className={`sidebar ${isSidebarReadOnly ? "read-only" : ""}`} 
 					xs={12}
 					sm={2}
 					xl={2}
-					direction="column">
+					direction="column"
+					sx={{
+						position: 'relative',
+					}}>
 					<EntityList />
+					<EntityDetail />
 				</Grid>
 				<Grid item xs={12} sm={10} xl={10} >
 					<MainPanel

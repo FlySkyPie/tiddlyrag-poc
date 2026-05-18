@@ -1,17 +1,43 @@
 import { Virtuoso } from 'react-virtuoso'
 import useMeasure from 'react-use-measure'
-import { Box } from '@mui/material';
+import { Box, ListItem, ListItemButton, ListItemText } from '@mui/material';
+
+import { useEntityStore } from '../store/entity-store';
+
+
+interface RowComponentProps {
+    index: number;
+}
+
+function Row(props: RowComponentProps) {
+    const { index } = props;
+    const { entities, select } = useEntityStore();
+    const entity = entities[index];
+
+    return (
+        <ListItem dense component="div" disablePadding>
+            <ListItemButton onClick={() => select(entity)}>
+                <ListItemText primary={
+                    typeof entity.name === 'string' ?
+                        entity.name :
+                        `Entity ${index + 1}`
+                } />
+            </ListItemButton>
+        </ListItem>
+    );
+}
 
 export const EntityList: React.FC = () => {
     const [ref, bounds] = useMeasure();
+    const { entities } = useEntityStore();
 
     return (
         <Box ref={ref} width={'100%'} height={'100%'}>
             <Virtuoso
                 style={{ height: `${bounds.height}px` }}
-                totalCount={200}
+                totalCount={entities.length}
                 itemContent={(index) =>
-                    <div>Item {index}</div>} />
+                    <Row index={index} />} />
         </Box>
     );
 };
