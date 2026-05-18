@@ -99,6 +99,7 @@ export class AgentSession {
       repo,
       fsPath: '.',
       fsName: '.',
+      name: '.',
       fsSize: 0,
       isFsDir: true,
       isExplored: undefined,
