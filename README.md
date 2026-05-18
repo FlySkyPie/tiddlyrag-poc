@@ -23,7 +23,7 @@ Please check [the planning repo](https://github.com/FlySkyPie/tiddlyrag-planning
 
 ## Demo Video
 
-[demo.mp4](./docs/demo.mp4)
+[demo.mp4](./docs/demo.webm)
 
 ## Credit
 
