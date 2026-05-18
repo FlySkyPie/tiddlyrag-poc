@@ -69,7 +69,7 @@ export class AgentSession {
   }
 
   public start() {
-    this.timer = setInterval(() => {
+    const doTick = () => {
       if (!this.behaviourTree) {
         return;
       }
@@ -81,12 +81,16 @@ export class AgentSession {
       if (delta) {
         this.socket.emit('btUpdated', delta);
       }
-    }, 100);
+
+      this.timer = setTimeout(doTick, 100);
+    };
+
+    this.timer = setTimeout(doTick, 100);
   }
 
   public dispose() {
     if (this.timer) {
-      clearInterval(this.timer);
+      clearTimeout(this.timer);
       this.timer = null;
     }
     this.behaviourTree = null;
