@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 
 import PlayArrow from '@mui/icons-material/PlayArrow';
-import Repeat from '@mui/icons-material/Repeat';
-import Stop from "@mui/icons-material/Stop";
 import FitScreen from "@mui/icons-material/FitScreen";
 import Fab from "@mui/material/Fab/Fab";
+import { Tooltip } from "@mui/material";
 
 import { ActiveConnector } from "./workflo/ActiveConnector";
 import { SucceededConnector } from "./workflo/SucceededConnector";
@@ -17,11 +16,11 @@ import './MainPanel.css';
 import { FailedConnector } from "./workflo/FailedConnector";
 
 export type CanvasElements = { nodes: NodeType[], edges: ConnectorType[] };
-  
+
 /**
  * The MainPanel component props.
  */
-export type MainPanelProps = {
+export interface MainPanelProps {
     /** The layout identifier. */
     layoutId: string | null;
 
@@ -34,17 +33,13 @@ export type MainPanelProps = {
 
     showStopButton: boolean;
 
-    onPlayButtonClick?:()=> void;
-
-    onReplayButtonClick(): void;
-
-    onStopButtonClick(): void;
+    onPlayButtonClick?: () => void;
 }
 
 /**
  * The MainPanel component.
  */
- export const MainPanel: React.FunctionComponent<MainPanelProps> = ({ layoutId, elements, showPlayButton, showReplayButton, showStopButton, onPlayButtonClick, onReplayButtonClick, onStopButtonClick }) => {
+export const MainPanel: React.FunctionComponent<MainPanelProps> = ({ layoutId, elements, onPlayButtonClick }) => {
     const [canvasInstance, setCanvasInstance] = useState<WorkflowCanvasInstance | null>(null);
     const [isFitNeeded, setIsFitNeeded] = useState<boolean>(true);
     const [lastLayoutId, setLastLayoutId] = useState<string | null>(null);
@@ -85,27 +80,27 @@ export type MainPanelProps = {
                 }}
             />
             <div className="main-panel-fab-container">
-                <Fab onClick={onPlayButtonClick} className="run-tree-fab main-panel-fab" size="medium" color="primary">
-                    <PlayArrow/>
+                <Fab
+                    className="run-tree-fab main-panel-fab"
+                    size="medium"
+                    color="primary"
+                    onClick={onPlayButtonClick}>
+                    <Tooltip title="Start Demo">
+                        <PlayArrow />
+                    </Tooltip>
                 </Fab>
-              
-                 {showReplayButton && (
-                    <Fab onClick={onReplayButtonClick} className="run-tree-fab main-panel-fab" size="medium" color="primary">
-                        <Repeat/>
-                    </Fab>
-                )}
-                {showStopButton && (
-                    <Fab onClick={onStopButtonClick} className="run-tree-fab main-panel-fab" size="medium" color="primary">
-                        <Stop/>
-                    </Fab>
-                )}
                 {!!elements.edges.length && !!elements.nodes.length && (
-                    <Fab onClick={() => canvasInstance?.fit()} className="run-tree-fab main-panel-fab" size="medium" color="primary">
-                        <FitScreen/>
+                    <Fab
+                        className="run-tree-fab main-panel-fab"
+                        size="medium"
+                        color="primary"
+                        onClick={() => canvasInstance?.fit()}>
+                        <Tooltip title="Re-center Viewport">
+                            <FitScreen />
+                        </Tooltip>
                     </Fab>
                 )}
             </div>
         </div>
     );
-  }
-  
+}

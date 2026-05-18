@@ -87,8 +87,6 @@ export const App: React.FC = () => {
 							"repo": "ariadne-gis"
 						})
 					}}
-					onReplayButtonClick={() => { }}
-					onStopButtonClick={() => { }}
 				/>
 				<ToastContainer />
 			</Grid>
